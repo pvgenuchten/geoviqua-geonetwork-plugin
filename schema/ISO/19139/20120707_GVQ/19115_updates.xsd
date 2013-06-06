@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!--Created with Liquid XML Studio Developer Edition (Education) 9.1.11.3570 (http://www.liquid-technologies.com)-->
+<xs:schema xmlns:updated19115="http://www.geoviqua.org/19115_updates" 
+xmlns:gco="http://www.isotc211.org/2005/gco" 
+xmlns:gmd="http://www.isotc211.org/2005/gmd" 
+targetNamespace="http://www.geoviqua.org/19115_updates" 
+xmlns:xs="http://www.w3.org/2001/XMLSchema"
+elementFormDefault="qualified" 
+version="3.1.0">
+    
+<!--  online schema location - ISO at opengis -->
+    <xs:import schemaLocation="../../../ISO/19139/20070417/gco/gco.xsd" namespace="http://www.isotc211.org/2005/gco" />
+    <xs:import schemaLocation="../../../ISO/19139/20070417/gmd/gmd.xsd" namespace="http://www.isotc211.org/2005/gmd" />
+
+    <!-- ======================= Update to MD_Identifer from recent 19115 versions ============================================ -->
+    <xs:complexType name="MD_Identifier_Type">
+        <xs:complexContent>
+            <xs:extension base="gmd:MD_Identifier_Type">
+                <xs:sequence>
+                    <xs:element name="codeSpace" type="gco:CharacterString_PropertyType" minOccurs="0" maxOccurs="1"/>
+                    <xs:element name="version" type="gco:CharacterString_PropertyType" minOccurs="0" maxOccurs="1"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <!-- ........................................................................ -->
+    <xs:element name="MD_Identifier" type="updated19115:MD_Identifier_Type" substitutionGroup="gmd:MD_Identifier"/>
+    <!-- ........................................................................ -->
+   <xs:complexType name="MD_Identifier_PropertyType">
+        <xs:sequence minOccurs="0">
+            <xs:element ref="updated19115:MD_Identifier" />
+        </xs:sequence>
+        <xs:attributeGroup ref="gco:ObjectReference" />
+        <xs:attribute ref="gco:nilReason" />
+    </xs:complexType> 
+    <!-- =========================================================================== -->
+    <!-- ======================= MD_AssociatedResource: new to 19115 ============================================ -->
+    <xs:complexType name="MD_AssociatedResource_Type">
+        <xs:complexContent>
+            <xs:extension base="gco:AbstractObject_Type">
+                <xs:sequence>
+                    <xs:element name="name" type="gmd:CI_Citation_PropertyType" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="associationType" type="gmd:DS_AssociationTypeCode_PropertyType" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="initiativeType" type="gmd:DS_InitiativeTypeCode_PropertyType" minOccurs="0" maxOccurs="1" />
+                    <!-- the two elements above need to be constrained, but not AS A CHOICE, SO THAT THERE IS AT LEAST ONE provided -->
+                    <xs:element name="metadataReference" type="gmd:CI_Citation_PropertyType" minOccurs="0" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <!-- ........................................................................ -->
+    <xs:element name="MD_AssociatedResource" type="updated19115:MD_AssociatedResource_Type" />
+    <!-- ........................................................................ -->
+    <xs:complexType name="MD_AssociatedResource_PropertyType">
+        <xs:sequence minOccurs="0">
+            <xs:element ref="updated19115:MD_AssociatedResource" />
+        </xs:sequence>
+        <xs:attributeGroup ref="gco:ObjectReference" />
+        <xs:attribute ref="gco:nilReason" />
+    </xs:complexType>
+    <!-- =========================================================================== -->
+	<xs:complexType name="CI_OnlineResource_Type">
+		<xs:annotation>
+			<xs:documentation>Information about online sources from which the dataset, specification, or community profile name and extended metadata elements can be obtained.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="gmd:CI_OnlineResource_Type">
+				<xs:sequence>
+                    <!--
+					<xs:element name="linkage" type="gmd:URL_PropertyType"/>
+					<xs:element name="protocol" type="gco:CharacterString_PropertyType" minOccurs="0"/>
+					<xs:element name="applicationProfile" type="gco:CharacterString_PropertyType" minOccurs="0"/>
+					<xs:element name="name" type="gco:CharacterString_PropertyType" minOccurs="0"/>
+					<xs:element name="description" type="gco:CharacterString_PropertyType" minOccurs="0"/>
+					<xs:element name="function" type="gmd:CI_OnLineFunctionCode_PropertyType" minOccurs="0"/>
+                    -->
+                    <!-- added as part of 19115-1 -->
+                    <xs:element name="protocolRequest" type="gco:CharacterString_PropertyType" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!-- ........................................................................ -->
+	<xs:element name="CI_OnlineResource" type="updated19115:CI_OnlineResource_Type" substitutionGroup="gmd:CI_OnlineResource"/>
+	<!-- ........................................................................ -->
+	<xs:complexType name="CI_OnlineResource_PropertyType">
+		<xs:sequence minOccurs="0">
+			<xs:element ref="updated19115:CI_OnlineResource"/>
+		</xs:sequence>
+		<xs:attributeGroup ref="gco:ObjectReference"/>
+		<xs:attribute ref="gco:nilReason"/>
+	</xs:complexType>
+</xs:schema>
