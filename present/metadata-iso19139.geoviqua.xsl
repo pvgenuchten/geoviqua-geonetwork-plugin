@@ -49,8 +49,8 @@
 		</xsl:copy>
 	</xsl:template>
 
-	<!-- discard code definitions that occur more than once in the document and don't have the GeoViQua codespace -->
-	<xsl:template mode="codelistsCopyProcessing" match="//gmx:codeEntry[gmx:CodeDefinition[(gml:identifier/@codeSpace != 'GeoViQua') and (count(key('kCodeDefinitionById', @gml:id)) > 1)]]"/>
+	<!-- discard code definitions that occur more than once in the document and don't have the GeoViQua or ISOTC211/19157 codespace -->
+	<xsl:template mode="codelistsCopyProcessing" match="//gmx:codeEntry[gmx:CodeDefinition[(gml:identifier/@codeSpace != 'GeoViQua' and gml:identifier/@codeSpace != 'ISOTC211/19157') and (count(key('kCodeDefinitionById', @gml:id)) > 1)]]"/>
 
 	<!-- process the combined codelists -->
 	<xsl:variable name="codelistsProcessed">
