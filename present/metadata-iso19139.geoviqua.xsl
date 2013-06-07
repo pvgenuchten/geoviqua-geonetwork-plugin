@@ -10,7 +10,7 @@
     xmlns:gmx="http://www.isotc211.org/2005/gmx"
     xmlns:srv="http://www.isotc211.org/2005/srv"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:gml="http://www.opengis.net/gml"
+    xmlns:gml="http://www.opengis.net/gml/3.2"
     xmlns:xlink="http://www.w3.org/1999/xlink"
     xmlns:geonet="http://www.fao.org/geonetwork"
     xmlns:exslt="http://exslt.org/common"
@@ -27,7 +27,7 @@
 	<xsl:variable name="codelistsgvq" select="document('../schema/GVQ/3.1.0/resources/Codelist/gvqCodelists.xml')"/>
 	<xsl:variable name="codelistsgmd19157" select="document('../schema/ISO/19157/20120707_GVQ/resources/Codelist/gmd19157_Codelists.xml')"/>
 	<!-- load iso19139 codelists -->
-	<xsl:variable name="codelistsgmx19139" select="document('../schema/ISO/19139/20070417/resources/Codelist/gmxCodelists.xml')"/>
+	<xsl:variable name="codelistsgmx19139" select="document('../schema/ISO/19139/20070417/resources/codelist/gmxCodelists.xml')"/>
 
 	<!-- deep-copy each set of codelists to combine them -->
 	<xsl:variable name="codelistsCopy">
