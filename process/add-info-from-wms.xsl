@@ -6,7 +6,7 @@
   xmlns:srv="http://www.isotc211.org/2005/srv"
   xmlns:gmd="http://www.isotc211.org/2005/gmd" 
   xmlns:math="http://exslt.org/math" 
-  xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/3.1" version="2.0"
+  xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/4.0" version="2.0"
   exclude-result-prefixes="srv gco gmd exslt geonet math">
 
   <xsl:import href="process-utility.xsl"/>

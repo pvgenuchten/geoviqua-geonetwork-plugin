@@ -5,7 +5,7 @@
   xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:geonet="http://www.fao.org/geonetwork" xmlns:exslt="http://exslt.org/common"
-  xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/3.1"
+  xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/4.0"
   xmlns:saxon="http://saxon.sf.net/" extension-element-prefixes="saxon"
   exclude-result-prefixes="gvq gmx xsi gmd gco gml gts srv xlink exslt geonet">
 

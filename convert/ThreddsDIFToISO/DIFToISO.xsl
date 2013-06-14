@@ -16,7 +16,7 @@
 	xmlns:dif="http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/"
 	xmlns:fn="http://www.w3.org/2005/02/xpath-functions"
 	xmlns:util="java:java.util.UUID"
-  xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/3.1"
+  xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/4.0"
 	exclude-result-prefixes="dif fn util">
 
   <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes" media-type="text/plain"/>

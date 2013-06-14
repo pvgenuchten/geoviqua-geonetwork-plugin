@@ -8,7 +8,7 @@
 	xmlns:gmd="http://www.isotc211.org/2005/gmd"
 	xmlns:srv="http://www.isotc211.org/2005/srv"
 	xmlns:geonet="http://www.fao.org/geonetwork"
-	xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/3.1"
+	xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/4.0"
 	exclude-result-prefixes="gmd srv gco">
 	
 	<xsl:param name="displayInfo"/>

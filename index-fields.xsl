@@ -7,7 +7,7 @@
 										xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 										xmlns:gmx="http://www.isotc211.org/2005/gmx"
                                         xmlns:skos="http://www.w3.org/2004/02/skos/core#"
-                                        xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/3.1">
+                                        xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/4.0">
 
 	<xsl:include href="convert/functions.xsl"/>
 	<xsl:include href="../../../xsl/utils-fn.xsl"/>

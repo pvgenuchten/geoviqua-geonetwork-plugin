@@ -10,7 +10,7 @@
 	xmlns:gco="http://www.isotc211.org/2005/gco" 
 	xmlns:geonet="http://www.fao.org/geonetwork" 
 	xmlns:xlink="http://www.w3.org/1999/xlink"
-	xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/3.1" version="1.0">
+	xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/4.0" version="1.0">
 <!--Implementers: please note that overriding process-prolog or process-root is 
     the preferred method for meta-stylesheets to use where possible. -->
 <xsl:param name="archiveDirParameter"/>

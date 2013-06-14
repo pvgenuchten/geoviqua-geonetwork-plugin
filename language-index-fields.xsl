@@ -6,7 +6,7 @@
 										xmlns:srv="http://www.isotc211.org/2005/srv"
 										xmlns:java="java:org.fao.geonet.util.XslUtil"
 										xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-										xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/3.1">
+										xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/4.0">
 
 	<!--This file defines what parts of the metadata are indexed by Lucene
 		Searches can be conducted on indexes defined here.

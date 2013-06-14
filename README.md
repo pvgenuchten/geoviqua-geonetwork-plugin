@@ -1,6 +1,6 @@
 ## About ##
 
-A plugin which enables the creation, editing and cataloguing of metadata that uses the [GeoViQua 3.1.0 schema][3], within a standard [GeoNetwork v2.8.0][4] installation. 
+A plugin which enables the creation, editing and cataloguing of metadata that uses the [GeoViQua 4.0 schema][3], within a standard [GeoNetwork v2.8.0][4] installation. 
 
 ## Installation ##
 
@@ -15,5 +15,5 @@ Alternatively, you could clone the repo directly via Git:
 
 [1]: http://geonetwork-opensource.org/manuals/2.8.0/eng/users/managing_metadata/schemas/index.html
 [2]: https://github.com/lushc/geoviqua-geonetwork-plugin/archive/2.8.x-dev.zip
-[3]: http://schemas.geoviqua.org/GVQ/3.1.0/
+[3]: http://schemas.geoviqua.org/GVQ/4.0/
 [4]: http://www.geonetwork-opensource.org/ 

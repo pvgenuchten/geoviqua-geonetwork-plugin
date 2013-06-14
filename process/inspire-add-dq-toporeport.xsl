@@ -11,7 +11,7 @@
   xmlns:gmd="http://www.isotc211.org/2005/gmd" 
   xmlns:skos="http://www.w3.org/2004/02/skos/core#"
   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-  xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/3.1" 
+  xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/4.0" 
   exclude-result-prefixes="gmd">
 
   <xsl:import href="process-utility.xsl"/>

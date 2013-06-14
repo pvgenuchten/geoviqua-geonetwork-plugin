@@ -6,7 +6,7 @@
     xmlns:gco="http://www.isotc211.org/2005/gco" 
     xmlns:gmd="http://www.isotc211.org/2005/gmd"
     xmlns:geonet="http://www.fao.org/geonetwork" 
-    xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/3.1" exclude-result-prefixes="gmd srv">
+    xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/4.0" exclude-result-prefixes="gmd srv">
 
 
     <!-- Parameters -->

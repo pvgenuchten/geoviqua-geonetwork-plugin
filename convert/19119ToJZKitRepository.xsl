@@ -4,7 +4,7 @@
 						xmlns:gco="http://www.isotc211.org/2005/gco"
 						xmlns:srv="http://www.isotc211.org/2005/srv"
 						xmlns:gmd="http://www.isotc211.org/2005/gmd"
-						xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/3.1"
+						xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/4.0"
 						exclude-result-prefixes="gmd gco srv">
 
 	<xsl:output method="xml" indent="yes"/>

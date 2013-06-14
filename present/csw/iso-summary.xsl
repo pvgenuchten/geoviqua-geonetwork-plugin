@@ -7,7 +7,7 @@
 										xmlns:srv="http://www.isotc211.org/2005/srv"
 										xmlns:ows="http://www.opengis.net/ows"
 										xmlns:geonet="http://www.fao.org/geonetwork"
-										xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/3.1">
+										xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/4.0">
 
 	<xsl:param name="displayInfo"/>
 	

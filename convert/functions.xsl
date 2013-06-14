@@ -8,7 +8,7 @@
                     xmlns:java="java:org.fao.geonet.util.XslUtil"
                     xmlns:joda="java:org.fao.geonet.util.JODAISODate"
                     xmlns:mime="java:org.fao.geonet.util.MimeTypeFinder"
-                    xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/3.1"
+                    xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/4.0"
                     exclude-result-prefixes="#all">
     
     <!-- ========================================================================================= -->

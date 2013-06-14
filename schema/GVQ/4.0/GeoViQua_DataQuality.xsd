@@ -3,12 +3,12 @@
 <xs:schema xmlns:gmd19157="http://www.geoviqua.org/gmd19157" 
 xmlns:updated19115="http://www.geoviqua.org/19115_updates" 
 xmlns:gco="http://www.isotc211.org/2005/gco" 
-xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/3.1" 
+xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/4.0" 
 xmlns:gmd="http://www.isotc211.org/2005/gmd" 
 elementFormDefault="qualified" 
-targetNamespace="http://www.geoviqua.org/QualityInformationModel/3.1" 
+targetNamespace="http://www.geoviqua.org/QualityInformationModel/4.0" 
 xmlns:xs="http://www.w3.org/2001/XMLSchema" 
-version="3.1.0">
+version="4.0.0">
     
 <!-- Online schema locations - ISO, UncertML (if required) and local for GeoViQua -->
     <xs:import schemaLocation="../../ISO/19139/20070417/gco/gco.xsd" namespace="http://www.isotc211.org/2005/gco" /> 

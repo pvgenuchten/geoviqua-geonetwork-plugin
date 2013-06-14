@@ -12,7 +12,7 @@ attached it to the metadata for data.
 										xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 										xmlns:xlink="http://www.w3.org/1999/xlink"
 										xmlns:date="http://exslt.org/dates-and-times"
-										xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/3.1">
+										xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/4.0">
 	<xsl:param name="protocol" select="'OGC:WMS-1.1.1-http-get-map'"/>
 	<xsl:param name="url"/>
 	<xsl:param name="desc"/>

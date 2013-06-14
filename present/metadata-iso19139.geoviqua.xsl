@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="2.0" xmlns:xsl ="http://www.w3.org/1999/XSL/Transform" 
-    xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/3.1"
+    xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/4.0"
     xmlns:updated19115="http://www.geoviqua.org/19115_updates"
     xmlns:gmd19157="http://www.geoviqua.org/gmd19157"
     xmlns:un="http://www.uncertml.org/2.0"
@@ -24,14 +24,17 @@
 	<!-- ===================================================================== -->
 
 	<!-- load geoviqua codelists -->
-	<xsl:variable name="codelistsgvq" select="document('../schema/GVQ/3.1.0/resources/Codelist/gvqCodelists.xml')"/>
+	<xsl:variable name="codelistsgvq" select="document('../schema/GVQ/4.0/resources/Codelist/gvqCodelists.xml')"/>
 	<xsl:variable name="codelistsgmd19157" select="document('../schema/ISO/19157/20120707_GVQ/resources/Codelist/gmd19157_Codelists.xml')"/>
+	<xsl:variable name="codelistsgmd19115updates" select="document('../schema/ISO/19139/20120707_GVQ/resources/Codelist/gmxUpdatedCodelists.xml')"/>
+	<!-- load INSPIRE codelists -->
+	<xsl:variable name="codelistsgmdINSPIRE" select="document('../schema/ISO/19139/20130610_INSPIRE/resources/codelist/gmxINSPIRECodelists.xml')"/>
 	<!-- load iso19139 codelists -->
 	<xsl:variable name="codelistsgmx19139" select="document('../schema/ISO/19139/20070417/resources/codelist/gmxCodelists.xml')"/>
 
 	<!-- deep-copy each set of codelists to combine them -->
 	<xsl:variable name="codelistsCopy">
-		<xsl:for-each select="$codelistsgvq | $codelistsgmd19157 | $codelistsgmx19139">
+		<xsl:for-each select="$codelistsgvq | $codelistsgmd19157 | $codelistsgmd19115updates | $codelistsgmdINSPIRE | $codelistsgmx19139">
 			<xsl:copy-of select="."/>
 		</xsl:for-each>
 	</xsl:variable>

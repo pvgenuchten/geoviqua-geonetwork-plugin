@@ -6,7 +6,7 @@
 	xmlns:gco="http://www.isotc211.org/2005/gco"
 	xmlns:gmd="http://www.isotc211.org/2005/gmd" 
 	xmlns:xlink="http://www.w3.org/1999/xlink"
-	xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/3.1" exclude-result-prefixes="#all">
+	xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/4.0" exclude-result-prefixes="#all">
 
 	<xsl:include href="../iso19139/convert/functions.xsl"/>
 
