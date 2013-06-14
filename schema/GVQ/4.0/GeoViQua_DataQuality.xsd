@@ -45,7 +45,7 @@ version="4.0.0">
                 <xs:sequence>
                     <xs:element name="target" type="updated19115:MD_Identifier_PropertyType" minOccurs="1" maxOccurs="1" />
                     <xs:element name="doi" type="gco:CharacterString_PropertyType" minOccurs="0" maxOccurs="1" />
-                    <xs:element name="volume" type="xs:integer" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="volume" type="gco:Integer_PropertyType" minOccurs="0" maxOccurs="1" />
                     <xs:element name="issue" type="gco:CharacterString_PropertyType" minOccurs="0" maxOccurs="1" />
                     <xs:element name="pages" type="gco:CharacterString_PropertyType" minOccurs="0" maxOccurs="1" />
                     <xs:element name="purpose" type="gvq:GVQ_PublicationPurposeCode_PropertyType" minOccurs="0" maxOccurs="1" />
