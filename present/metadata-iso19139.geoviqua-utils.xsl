@@ -7,9 +7,9 @@
 
   <!-- Check for image file extension -->
   <xsl:function name="gvq:is-image" as="xs:boolean">
-    <xsl:param name="fileName" as="xs:string"/>
+    <xsl:param name="fileName" as="xs:string?"/>
     <xsl:choose>
-      <xsl:when test="geonet:ends-with-any-of(lower-case($fileName), ('gif', 'png', 'jpg', 'jpeg', 'bmp', 'tiff', 'svg'))"><xsl:value-of select="true()"/></xsl:when>
+      <xsl:when test="string-length($fileName) != 0 and geonet:ends-with-any-of(lower-case($fileName), ('gif', 'png', 'jpg', 'jpeg', 'bmp', 'tiff', 'svg'))"><xsl:value-of select="true()"/></xsl:when>
       <xsl:otherwise><xsl:value-of select="false()"/></xsl:otherwise>
     </xsl:choose>
   </xsl:function>
