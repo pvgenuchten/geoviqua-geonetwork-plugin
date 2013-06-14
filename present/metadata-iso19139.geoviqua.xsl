@@ -14,10 +14,11 @@
     xmlns:xlink="http://www.w3.org/1999/xlink"
     xmlns:geonet="http://www.fao.org/geonetwork"
     xmlns:exslt="http://exslt.org/common"
-    exclude-result-prefixes="gmx xsi gmd gco gml gts srv xlink exslt geonet">
+    exclude-result-prefixes="gmx xsi gmd gco gml gts srv xlink exslt geonet gvq updated19115 gmd19157 un">
 
 	<xsl:include href="metadata-iso19139.geoviqua-fop.xsl"/>
 	<xsl:include href="metadata-iso19139.geoviqua-subtemplates.xsl"/>
+	<xsl:include href="metadata-iso19139.geoviqua-utils.xsl"/>
 
 	<!-- ===================================================================== -->
 	<!-- code list processing -->
@@ -627,13 +628,13 @@
 		 gco:CharacterString. To turn this on add a schema 
 		 suggestion.
 	-->
-<!-- 	<xsl:template mode="iso19139" name="file-upload" match="*[gmx:FileName]">
+ 	<xsl:template mode="iso19139.geoviqua" name="file-upload-geoviqua" match="*[gmx:FileName]">
 		<xsl:param name="schema"/>
 		<xsl:param name="edit"/>
 
 		<xsl:variable name="src" select="gmx:FileName/@src"/>
 
-		<xsl:call-template name="file-or-logo-upload">
+		<xsl:call-template name="file-or-logo-upload-geoviqua">
 			<xsl:with-param name="schema" select="$schema"/>
 			<xsl:with-param name="edit" select="$edit"/>
 			<xsl:with-param name="ref" select="gmx:FileName/geonet:element/@ref"/>
@@ -644,7 +645,7 @@
 			<xsl:with-param name="visible" select="false()"/>
 			<xsl:with-param name="action" select="concat('startFileUpload(', /root/*/geonet:info/id, ', ', $apos, gmx:FileName/geonet:element/@ref, $apos, ');')"/>
 		</xsl:call-template>
-	</xsl:template> -->
+	</xsl:template>
 
   <!-- Add exception to display downloadable thesaurus differently -->
 	<xsl:template mode="iso19139.geoviqua" match="gmd:otherCitationDetails[gmx:FileName and contains(../@id,'geonetwork.thesaurus')]" priority="2">
@@ -679,7 +680,7 @@
 		<xsl:param name="schema"/>
 		<xsl:param name="edit"/>
 
-		<xsl:call-template name="file-or-logo-upload">
+		<xsl:call-template name="file-or-logo-upload-geoviqua">
 			<xsl:with-param name="schema" select="$schema"/>
 			<xsl:with-param name="edit" select="$edit"/>
 			<xsl:with-param name="ref" select="gmx:FileName/geonet:element/@ref"/>
@@ -695,7 +696,7 @@
 		</xsl:call-template>
 	</xsl:template>
 
-<!-- 	<xsl:template name="file-or-logo-upload">
+ 	<xsl:template name="file-or-logo-upload-geoviqua">
 		<xsl:param name="schema"/>
 		<xsl:param name="edit"/>
 		<xsl:param name="ref"/>
@@ -705,9 +706,9 @@
 		<xsl:param name="delButton" select="normalize-space($value)!=''"/>
 		<xsl:param name="setButton" select="normalize-space($value)!=''"/>
 		<xsl:param name="visible" select="not($setButton)"/>
-		<xsl:param name="setButtonLabel" select="/root/gui/strings/insertFileMode"/> -->
+		<xsl:param name="setButtonLabel" select="/root/gui/strings/insertFileMode"/>
 		<!-- Create a new simple element with this label and @src value -->
-<!-- 		<xsl:param name="label" select="/root/gui/strings/file"/>
+ 		<xsl:param name="label" select="/root/gui/strings/file"/>
 
 
 		<xsl:apply-templates mode="complexElement" select=".">
@@ -759,12 +760,12 @@
 							<xsl:with-param name="id" select="concat('di_',$ref)"/>
 						</xsl:call-template>
 					</xsl:when>
-					<xsl:otherwise> -->
+					<xsl:otherwise>
 						<!-- in view mode, if a label is provided display a simple element for this label
 						with the link variable (could be an image or a hyperlink)-->
-<!-- 						<xsl:variable name="link">
+ 						<xsl:variable name="link">
 							<xsl:choose>
-								<xsl:when test="geonet:is-image(gmx:FileName/@src)">
+								<xsl:when test="gvq:is-image(gmx:FileName/@src)">
 									<img class="logo-wrap" src="{gmx:FileName/@src}"/>
 								</xsl:when>
 								<xsl:otherwise>
@@ -808,7 +809,7 @@
 				</xsl:choose>
 			</xsl:with-param>
 		</xsl:apply-templates>
-	</xsl:template> -->
+	</xsl:template>
 
 
 	<!-- ================================================================= -->
@@ -4315,4 +4316,5 @@
 	<xsl:template mode="iso19139.geoviqua" match="*|@*"/>
 
 	<xsl:template name="iso19139.geoviqua-javascript"/>
+
 </xsl:stylesheet>
