@@ -12,6 +12,59 @@ Alternatively, you could clone the repo directly via Git:
 
 	cd INSTALL_DIR/web/geonetwork/WEB-INF/data/config/schema_plugins
 	git clone https://github.com/lushc/geoviqua-geonetwork-plugin.git iso19139.geoviqua
+	
+## Configuration ##
+
+### Enable Metadata Export Services ###
+
+You must configure your GeoNetwork installation to expose additional metadata conversion services so that, at a minimum, users can download GeoViQua metadata records directly from the GeoNetwork catalog as XML. `schema-conversions.xml` lists the available converters provided by this plugin.
+
+To enable the export of GeoViQua documents, edit `INSTALL_DIR/web/geonetwork/WEB-INF/config-export.xml` to register the xml_geoviqua converter:
+```xml
+<geonet>
+	<services package="org.fao.geonet">
+	
+		...
+		
+		<service name="xml_geoviqua">
+			<class name=".services.metadata.Convert" />
+			<error id="operation-not-allowed" sheet="error-embedded.xsl" statusCode="403">
+				<xml name="error" file="xml/privileges-error.xml" />
+			</error>
+		</service>
+		
+		...
+		
+    </services>
+</geonet>
+```
+
+Then edit `INSTALL_DIR/web/geonetwork/WEB-INF/user-profiles.xml` to enable user groups to use the xml_geoviqua converter:
+```xml
+<profiles>
+	
+	...
+	
+	<profile name="Guest">
+	
+		...
+	
+		<!-- Metadata export services -->
+		<allow service="xml_geoviqua"/>
+	
+		...
+	
+	</profile>
+	
+	...
+	
+</profiles>
+```
+
+Once these changes to both files have been made, restart GeoNetwork. 
+
+Users will then have the option to export GeoViQua documents as XML when viewing search results or individual metadata records, providing their user group has publish privileges enabled for the metadata record in question.
+For anonymous users and web services, the publish privilege should be enabled for the "All" group.
 
 [1]: http://geonetwork-opensource.org/manuals/2.8.0/eng/users/managing_metadata/schemas/index.html
 [2]: https://github.com/lushc/geoviqua-geonetwork-plugin/archive/2.8.x-dev.zip
