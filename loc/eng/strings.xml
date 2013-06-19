@@ -9,6 +9,6 @@
   <temporalRef>Temporal information</temporalRef>
   <constraintInfo>Access constraint information</constraintInfo>
   <xml_geoviqua_to_iso19139>Save this metadata as an ISO19139 XML file</xml_geoviqua_to_iso19139>
-  <xml_iso19139Tooai_dc>Save this metadata as an OAI Dublin Core XML file</xml_iso19139Tooai_dc>
+  <xml_geoviqua_to_oai_dc>Save this metadata as an OAI Dublin Core XML file</xml_geoviqua_to_oai_dc>
   <xml_geoviqua>Save this metadata as a GeoViQua XML file</xml_geoviqua>
 </strings>
