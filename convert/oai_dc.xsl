@@ -25,7 +25,7 @@
 			
 			<!-- DataIdentification - - - - - - - - - - - - - - - - - - - - - -->
 
-			<xsl:for-each select="gmd:identificationInfo/gmd:MD_DataIdentification">
+			<xsl:for-each select="gmd:identificationInfo/gvq:GVQ_DataIdentification">
 
 				<xsl:for-each select="gmd:citation/gmd:CI_Citation">	
 					<xsl:for-each select="gmd:title/gco:CharacterString">
