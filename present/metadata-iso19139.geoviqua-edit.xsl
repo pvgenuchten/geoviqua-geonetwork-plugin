@@ -13,10 +13,7 @@
   xmlns:exslt="http://exslt.org/common"
   exclude-result-prefixes="gmx xsi gmd gco gml gts srv xlink exslt geonet">
 
-<!--   <xsl:include href="metadata-iso19139-utils.xsl"/>
-  <xsl:include href="metadata-iso19139-geo.xsl"/>
-  <xsl:include href="metadata-iso19139-inspire.xsl"/> -->
-  <xsl:include href="metadata-iso19139.geoviqua-view.xsl"/>
+  <xsl:import href="metadata-iso19139.geoviqua-view.xsl"/>
 
   <!-- Use this mode on the root element to add hidden fields to the editor -->
   <xsl:template mode="schema-hidden-fields" match="gvq:GVQ_Metadata|*[@gco:isoType='gmd:MD_Metadata']" priority="2">
@@ -31,17 +28,39 @@
   </xsl:template>
 
 
-  <!-- main template - the way into processing iso19139 -->
-  <xsl:template name="metadata-iso19139">
+  <!-- ===================================================================== -->
+  <!-- apply the geoviqua profile -->
+  <!-- ===================================================================== -->
+  
+  <!-- main template - the way into processing iso19139.geoviqua -->
+  <xsl:template match="metadata-iso19139.geoviqua" name="metadata-iso19139.geoviqua">
     <xsl:param name="schema"/>
     <xsl:param name="edit" select="false()"/>
     <xsl:param name="embedded"/>
-
-    <xsl:apply-templates mode="iso19139" select="." >
+    
+    <!-- process in profile mode first -->
+    <xsl:variable name="geoviquaElements">
+      <xsl:apply-templates mode="iso19139.geoviqua" select="." >
       <xsl:with-param name="schema" select="$schema"/>
-      <xsl:with-param name="edit"   select="$edit"/>
-      <xsl:with-param name="embedded" select="$embedded" />
-    </xsl:apply-templates>
+        <xsl:with-param name="edit"   select="$edit"/>
+        <xsl:with-param name="embedded" select="$embedded" />
+      </xsl:apply-templates>
+    </xsl:variable>
+
+    <xsl:choose>
+      <!-- if we got a match in profile mode then show it -->
+      <xsl:when test="count($geoviquaElements/*)>0">
+        <xsl:copy-of select="$geoviquaElements"/>
+      </xsl:when>
+      <!-- otherwise process in base iso19139 mode -->
+      <xsl:otherwise>
+          <xsl:apply-templates mode="iso19139" select="." >
+            <xsl:with-param name="schema" select="$schema"/>
+            <xsl:with-param name="edit"   select="$edit"/>
+            <xsl:with-param name="embedded" select="$embedded" />
+          </xsl:apply-templates>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <!-- =================================================================== -->
@@ -1014,7 +1033,7 @@
   </xsl:template>
   
 
-  <xsl:template mode="iso19139" match="//gmd:MD_Metadata/gmd:characterSet|//*[@gco:isoType='gmd:MD_Metadata']/gmd:characterSet" priority="2">
+  <xsl:template mode="iso19139" match="//gvq:GVQ_Metadata/gmd:characterSet|//*[@gco:isoType='gmd:MD_Metadata']/gmd:characterSet" priority="2">
     <xsl:param name="schema"/>
     <xsl:param name="edit"/>
     
@@ -1122,7 +1141,7 @@
                   <xsl:with-param name="langId">
                         <xsl:call-template name="getLangId">
                               <xsl:with-param name="langGui" select="/root/gui/language"/>
-                              <xsl:with-param name="md" select="ancestor-or-self::*[name(.)='gmd:MD_Metadata' or @gco:isoType='gmd:MD_Metadata']" />
+                              <xsl:with-param name="md" select="ancestor-or-self::*[name(.)='gvq:GVQ_Metadata' or @gco:isoType='gmd:MD_Metadata']" />
                           </xsl:call-template>
                     </xsl:with-param>
                   </xsl:call-template>
@@ -1352,7 +1371,7 @@
   <!-- Metadata -->
   <!-- ==================================================================== -->
 
-  <xsl:template mode="iso19139" match="gmd:MD_Metadata|*[@gco:isoType='gmd:MD_Metadata']">
+  <xsl:template mode="iso19139.geoviqua" match="gvq:GVQ_Metadata|*[@gco:isoType='gmd:MD_Metadata']">
     <xsl:param name="schema"/>
     <xsl:param name="edit"/>
     <xsl:param name="embedded"/>
@@ -1677,8 +1696,8 @@
     <!-- metadata info in its own box -->
 
     <xsl:call-template name="complexElementGuiWrapper">
-      <xsl:with-param name="title" select="/root/gui/schemas/iso19139/labels/element[@name='gmd:MD_Metadata']/label"/>
-      <xsl:with-param name="id" select="generate-id(/root/gui/schemas/iso19139/labels/element[@name='gmd:MD_Metadata']/label)"/>
+      <xsl:with-param name="title" select="/root/gui/schemas/iso19139/labels/element[@name='gvq:GVQ_Metadata']/label"/>
+      <xsl:with-param name="id" select="generate-id(/root/gui/schemas/iso19139/labels/element[@name='gvq:GVQ_Metadata']/label)"/>
       <xsl:with-param name="content">
 
       <xsl:apply-templates mode="elementEP" select="gmd:fileIdentifier|geonet:child[string(@name)='fileIdentifier']
@@ -2035,7 +2054,7 @@
       <xsl:otherwise>
         <xsl:value-of select="/root/gui/isoLang/record[code=$value]/label/child::*[name() = $lang]"/>
         
-        <!-- In view mode display other languages from gmd:locale of gmd:MD_Metadata element -->
+        <!-- In view mode display other languages from gmd:locale of gvq:GVQ_Metadata element -->
         <xsl:if test="../gmd:locale or ../../gmd:locale">
           <xsl:text> (</xsl:text><xsl:value-of select="string(/root/gui/schemas/iso19139/labels/element[@name='gmd:locale' and not(@context)]/label)"/>
           <xsl:text>:</xsl:text>
@@ -2157,7 +2176,7 @@
       <xsl:call-template name="getLangId">
         <xsl:with-param name="langGui" select="/root/gui/language" />
         <xsl:with-param name="md"
-          select="ancestor-or-self::*[name(.)='gmd:MD_Metadata' or @gco:isoType='gmd:MD_Metadata']" />
+          select="ancestor-or-self::*[name(.)='gvq:GVQ_Metadata' or @gco:isoType='gmd:MD_Metadata']" />
       </xsl:call-template>
     </xsl:variable>
 
@@ -2622,7 +2641,7 @@
       </xsl:variable>
       
       <xsl:variable name="title">
-        <xsl:apply-templates mode="escapeXMLEntities" select="/root/gmd:MD_Metadata/gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString"/>
+        <xsl:apply-templates mode="escapeXMLEntities" select="/root/gvq:GVQ_Metadata/gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString"/>
       </xsl:variable>
     
       <button type="button" class="content repository" 
@@ -2640,7 +2659,7 @@
   <!-- ===================================================================== -->
   <!-- === iso19139 brief formatting === -->
   <!-- ===================================================================== -->
-  <xsl:template mode="superBrief" match="gmd:MD_Metadata|*[@gco:isoType='gmd:MD_Metadata']" priority="2">
+  <xsl:template mode="superBrief" match="gvq:GVQ_Metadata|*[@gco:isoType='gmd:MD_Metadata']" priority="2">
     <xsl:variable name="langId">
       <xsl:call-template name="getLangId">
         <xsl:with-param name="langGui" select="/root/gui/language"/>
@@ -3214,7 +3233,7 @@
               <xsl:call-template name="getLangId">
                 <xsl:with-param name="langGui" select="/root/gui/language" />
                 <xsl:with-param name="md"
-                  select="ancestor-or-self::*[name(.)='gmd:MD_Metadata' or @gco:isoType='gmd:MD_Metadata']" />
+                  select="ancestor-or-self::*[name(.)='gvq:GVQ_Metadata' or @gco:isoType='gmd:MD_Metadata']" />
               </xsl:call-template>
             </xsl:variable>
             
@@ -3258,14 +3277,14 @@
   
   <!-- ===================================================================== -->
   <!-- Templates to retrieve thumbnails -->
-  <xsl:template mode="get-thumbnail" match="gmd:MD_Metadata|*[@gco:isoType='gmd:MD_Metadata']">
+  <xsl:template mode="get-thumbnail" match="gvq:GVQ_Metadata|*[@gco:isoType='gmd:MD_Metadata']">
     <xsl:apply-templates mode="get-thumbnail" select="gmd:identificationInfo/*/gmd:graphicOverview"/>
   </xsl:template>
   
   <xsl:template mode="get-thumbnail" match="gmd:graphicOverview">
     <xsl:variable name="fileName" select="gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString"/>
     <xsl:variable name="desc" select="gmd:MD_BrowseGraphic/gmd:fileDescription/gco:CharacterString"/>
-    <xsl:variable name="info" select="ancestor::*[name(.) = 'gmd:MD_Metadata' or @gco:isoType='gmd:MD_Metadata']/geonet:info"></xsl:variable>
+    <xsl:variable name="info" select="ancestor::*[name(.) = 'gvq:GVQ_Metadata' or @gco:isoType='gmd:MD_Metadata']/geonet:info"></xsl:variable>
     
     <thumbnail>
       <href><xsl:value-of select="geonet:get-thumbnail-url($fileName, $info, /root/gui/locService)"/></href>
@@ -3466,262 +3485,8 @@
       <xsl:with-param name="edit"   select="$edit"/>
     </xsl:call-template>
   </xsl:template>
-  
-  
-  
-  
-  <!-- =====================================================================
-    Multilingual editor widget is composed of input box
-    with a list of languages defined in current metadata record. 
-    
-    Metadata languages are:
-    * the main language (gmd:MD_Metadata/gmd:language) and
-    * all languages defined in gmd:locale section. 
-  
-    Change this template to defined another multilingual widget.
-  -->
-  <xsl:template name="localizedCharStringField" >
-    <xsl:param name="schema" />
-    <xsl:param name="edit" />
-    <xsl:param name="class" select="''" />
-    
-    <xsl:variable name="langId">
-      <xsl:call-template name="getLangId">
-        <xsl:with-param name="langGui" select="/root/gui/language" />
-        <xsl:with-param name="md"
-          select="ancestor-or-self::*[name(.)='gmd:MD_Metadata' or @gco:isoType='gmd:MD_Metadata']" />
-      </xsl:call-template>
-    </xsl:variable>
-    
-    <xsl:variable name="widget">
-      <xsl:if test="$edit=true()">
-        <xsl:variable name="tmpFreeText">
-          <xsl:call-template name="PT_FreeText_Tree" />
-        </xsl:variable>
-      
 
-        <xsl:variable name="ptFreeTextTree" select="exslt:node-set($tmpFreeText)" />
-        
-        <xsl:variable name="mainLang"
-          select="string(/root/*/gmd:language/gco:CharacterString|/root/*/gmd:language/gmd:LanguageCode/@codeListValue)" />
-        <xsl:variable name="mainLangId">
-          <xsl:call-template name="getLangIdFromMetadata">
-            <xsl:with-param name="lang" select="$mainLang" />
-            <xsl:with-param name="md"
-              select="ancestor-or-self::*[name(.)='gmd:MD_Metadata' or @gco:isoType='gmd:MD_Metadata']" />
-          </xsl:call-template>
-        </xsl:variable>
+  <!-- match everything else and do nothing - leave that to iso19139 mode -->
+  <xsl:template mode="iso19139.geoviqua" match="*|@*"/> 
 
-        <span>
-          <!-- Match gco:CharacterString element which is in default language or
-            process a PT_FreeText with a reference to the main metadata language. -->
-          <xsl:choose>
-            <xsl:when test="gco:*">
-              <xsl:for-each select="gco:*">
-                <xsl:call-template name="getElementText">
-                  <xsl:with-param name="schema" select="$schema" />
-                  <xsl:with-param name="edit" select="true()" />
-                  <xsl:with-param name="class" select="$class" />
-                </xsl:call-template>
-              </xsl:for-each>                        
-            </xsl:when>
-            <xsl:when test="gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale=$mainLangId]">
-              <xsl:for-each select="gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale=$mainLangId]">
-                <xsl:call-template name="getElementText">
-                  <xsl:with-param name="schema" select="$schema" />
-                  <xsl:with-param name="edit" select="true()" />
-                  <xsl:with-param name="class" select="$class" />
-                </xsl:call-template>
-              </xsl:for-each>         
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:for-each select="$ptFreeTextTree//gmd:LocalisedCharacterString[@locale=$mainLangId]">
-                <xsl:call-template name="getElementText">
-                  <xsl:with-param name="schema" select="$schema" />
-                  <xsl:with-param name="edit" select="true()" />
-                  <xsl:with-param name="class" select="$class" />
-                </xsl:call-template>
-              </xsl:for-each>         
-            </xsl:otherwise>
-          </xsl:choose>
-          
-          <xsl:for-each select="$ptFreeTextTree//gmd:LocalisedCharacterString[@locale!=$mainLangId]">
-            <xsl:call-template name="getElementText">
-              <xsl:with-param name="schema" select="$schema" />
-              <xsl:with-param name="edit" select="true()" />
-              <xsl:with-param name="visible" select="false()" />
-              <xsl:with-param name="class" select="$class" />
-            </xsl:call-template>
-          </xsl:for-each>
-        </span>
-        <span class="lang">
-            <xsl:choose>
-              <xsl:when test="$ptFreeTextTree//gmd:LocalisedCharacterString">                
-                <!-- Create combo to select language.
-                On change, the input with selected language is displayed. Others hidden. -->
-
-                <xsl:variable name="mainLanguageRef">
-                  <xsl:choose>
-                      <xsl:when test="gco:CharacterString/geonet:element/@ref" >
-                          <xsl:value-of select="concat('_', gco:CharacterString/geonet:element/@ref)"/>
-                      </xsl:when>
-                      <xsl:otherwise>
-                          <xsl:value-of select="concat('_',
-                                  gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale=$mainLangId]/geonet:element/@ref)"/>
-                      </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:variable>
-
-                <xsl:variable name="suggestionDiv" select="concat('suggestion', $mainLanguageRef)"/>
-                
-                <!-- Language selector is only displayed when more than one language
-                is set in gmd:locale. -->
-                <select class="md lang_selector" name="localization" id="localization_{geonet:element/@ref}" 
-                  onchange="enableLocalInput(this);clearSuggestion('{$suggestionDiv}');" 
-                  selected="true">
-                  <xsl:attribute name="style">
-                    <xsl:choose>
-                      <xsl:when test="count($ptFreeTextTree//gmd:LocalisedCharacterString)=0">display:none;</xsl:when>
-                      <xsl:otherwise>display:block;</xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:attribute>
-                  <xsl:choose>
-                    <xsl:when test="gco:*">
-                      <option value="_{gco:*/geonet:element/@ref}" code="{substring-after($mainLangId, '#')}">
-                        <xsl:value-of
-                              select="/root/gui/isoLang/record[code=$mainLang]/label/*[name(.)=/root/gui/language]" />
-                      </option>
-                      <xsl:for-each select="$ptFreeTextTree//gmd:LocalisedCharacterString[@locale!=$mainLangId]">
-                        <option value="_{geonet:element/@ref}" code="{substring-after(@locale, '#')}">
-                          <xsl:value-of select="@language" />
-                        </option>
-                      </xsl:for-each>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:for-each select="$ptFreeTextTree//gmd:LocalisedCharacterString">
-                        <option value="_{geonet:element/@ref}" code="{substring-after(@locale, '#')}">
-                          <xsl:value-of select="@language" />
-                        </option>
-                      </xsl:for-each>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </select>
-            
-                <!-- =================================
-                    Google translation API demo
-                    See: http://code.google.com/apis/ajaxlanguage/documentation/
-                    =================================
-                    Simple button to translate one element from one language to another.
-                    This is useful to help editor to translate metadata content.
-                    
-                    To be improved :
-                     * check that jeeves GUI language is equal to Google language code
-                     * target parameter of translate function could be set to:
-                     $('localization_{geonet:element/@ref}').options[$('localization_{geonet:element/@ref}').selectedIndex].value
-                     but this will copy Google results to a form field. User should review suggested translation.
-                -->
-                <xsl:if test="/root/gui/config/editor-google-translate = 1">
-                  <xsl:text> </xsl:text>
-                  <a href="javascript:googleTranslate('{$mainLanguageRef}',
-                      '{$suggestionDiv}',
-                      null,
-                      '{substring-after($mainLangId, '#')}', 
-                      Ext.getDom('localization_{geonet:element/@ref}').options[Ext.getDom('localization_{geonet:element/@ref}').selectedIndex].getAttribute('code'));"                      
-                      alt="{/root/gui/strings/translateWithGoogle}" title="{/root/gui/strings/translateWithGoogle}">
-                    <img width="14px" src="../../images/translate.png"/>
-                  </a>
-                  <br/>
-                  <div id="suggestion_{gco:CharacterString/geonet:element/@ref|
-                    gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale=$mainLangId]/geonet:element/@ref}"
-                    style="display:none;"
-                    class="suggestion"
-                    alt="{/root/gui/strings/translateWithGoogle}" title="{/root/gui/strings/translateWithGoogle}"
-                  />
-                </xsl:if>
-              </xsl:when>
-            </xsl:choose>
-        </span>
-          
-      </xsl:if>
-    </xsl:variable>
-    <xsl:call-template name="iso19139String">
-      <xsl:with-param name="schema" select="$schema" />
-      <xsl:with-param name="edit" select="$edit" />
-      <xsl:with-param name="langId" select="$langId" />
-      <xsl:with-param name="widget" select="$widget" />
-      <xsl:with-param name="class" select="$class" />
-    </xsl:call-template>
-  </xsl:template>
-  
-  
-  <!-- 
-    Create a PT_FreeText_Tree for multilingual editing.
-    
-    The lang prefix for geonet:element is used by the DataManager 
-    to clean multilingual content and add required attribute (xsi:type).
-  -->  
-  <xsl:template name="PT_FreeText_Tree">
-    <xsl:variable name="mainLang"
-      select="string(/root/*/gmd:language/gco:CharacterString|/root/*/gmd:language/gmd:LanguageCode/@codeListValue)" />
-    <xsl:variable name="languages"
-      select="/root/*/gmd:locale/gmd:PT_Locale/gmd:languageCode/gmd:LanguageCode/@codeListValue" />
-    
-    <xsl:variable name="currentNode" select="node()" />
-    <xsl:for-each select="$languages">
-      <xsl:variable name="langId"
-        select="concat('&#35;',string(../../../@id))" />
-      <xsl:variable name="code">
-        <xsl:call-template name="getLangCode">
-          <xsl:with-param name="md"
-            select="ancestor-or-self::*[name(.)='gmd:MD_Metadata' or @gco:isoType='gmd:MD_Metadata']" />
-          <xsl:with-param name="langId" select="substring($langId,2)" />
-        </xsl:call-template>
-      </xsl:variable>
-        
-      <xsl:variable name="ref" select="$currentNode/../geonet:element/@ref" />
-      <xsl:variable name="min" select="$currentNode/../geonet:element/@min" />
-      <xsl:variable name="guiLang" select="/root/gui/language" />
-      <xsl:variable name="language"
-        select="/root/gui/isoLang/record[code=$code]/label/*[name(.)=$guiLang]" />
-      <gmd:PT_FreeText>
-        <gmd:textGroup>
-          <gmd:LocalisedCharacterString locale="{$langId}"
-            code="{$code}" language="{$language}">
-            <xsl:value-of
-              select="$currentNode//gmd:LocalisedCharacterString[@locale=$langId]" />
-            <xsl:choose>
-              <xsl:when
-                test="$currentNode//gmd:LocalisedCharacterString[@locale=$langId]">
-                <geonet:element
-                  ref="{$currentNode//gmd:LocalisedCharacterString[@locale=$langId]/geonet:element/@ref}" />
-              </xsl:when>
-              <xsl:otherwise>
-                <geonet:element ref="lang_{substring($langId,2)}_{$ref}" />
-              </xsl:otherwise>
-            </xsl:choose>
-          </gmd:LocalisedCharacterString>
-          <geonet:element ref="" />
-        </gmd:textGroup>
-        <geonet:element ref="">
-          <!-- Add min attribute from current node to PT_FreeText
-          child in order to turn on validation criteria. -->
-          <xsl:if test="$min = 1">
-            <xsl:attribute name="min">1</xsl:attribute>
-          </xsl:if>
-        </geonet:element>
-      </gmd:PT_FreeText>
-    </xsl:for-each>
-  </xsl:template>
-  
-  <!-- Template to return the function name to be use
-  to build the XML fragment in the editor. -->
-  <xsl:template mode="addXMLFragment" match="gmd:descriptiveKeywords|
-        geonet:child[@name='descriptiveKeywords' and @prefix='gmd']">
-    <xsl:text>Ext.getCmp('editorPanel').showKeywordSelectionPanel</xsl:text>
-  </xsl:template>
-  <xsl:template mode="addXMLFragment" match="gmd:referenceSystemInfo|
-        geonet:child[@name='referenceSystemInfo' and @prefix='gmd']">
-    <xsl:text>Ext.getCmp('editorPanel').showCRSSelectionPanel</xsl:text>
-  </xsl:template>
-  <xsl:template mode="addXMLFragment" match="*|@*"></xsl:template>  
 </xsl:stylesheet>
