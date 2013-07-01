@@ -1637,12 +1637,12 @@
 				<xsl:with-param name="content">
 
 					<xsl:for-each select="gvq:dataQualityInfo/gvq:GVQ_DataQuality">
-						<xsl:apply-templates mode="elementEP" select="gmd:scope|geonet:child[string(@name)='scope']">
+						<xsl:apply-templates mode="elementEP" select="gmd19157:scope|geonet:child[string(@name)='scope']">
 							<xsl:with-param name="schema" select="$schema"/>
 							<xsl:with-param name="edit"   select="$edit"/>
 						</xsl:apply-templates>
 
-						<xsl:apply-templates mode="elementEP" select="gmd:lineage|geonet:child[string(@name)='lineage']">
+						<xsl:apply-templates mode="elementEP" select="gmd19157:lineage|geonet:child[string(@name)='lineage']">
 							<xsl:with-param name="schema" select="$schema"/>
 							<xsl:with-param name="edit"   select="$edit"/>
 						</xsl:apply-templates>

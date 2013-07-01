@@ -118,9 +118,9 @@
   <!-- these elements should be boxed -->
   <!-- ===================================================================== -->
 
-  <xsl:template mode="iso19139" match="gmd:identificationInfo|gmd:distributionInfo|gmd:descriptiveKeywords|gmd:thesaurusName|
+  <xsl:template mode="iso19139.geoviqua" match="gmd:identificationInfo|gmd:distributionInfo|gmd:descriptiveKeywords|gmd:thesaurusName|
               *[name(..)='gmd:resourceConstraints']|gmd:spatialRepresentationInfo|gmd:pointOfContact|
-              gmd:dataQualityInfo|gmd:contentInfo|gmd:distributionFormat|
+              gvq:dataQualityInfo|gmd:contentInfo|gmd:distributionFormat|
               gmd:referenceSystemInfo|gmd:spatialResolution|gmd:offLine|gmd:projection|gmd:ellipsoid|gmd:extent[name(..)!='gmd:EX_TemporalExtent']|gmd:attributes|gmd:verticalCRS|
               gmd:geographicBox|gmd:EX_TemporalExtent|gmd:MD_Distributor|
               srv:containsOperations|srv:SV_CoupledResource|
@@ -1447,7 +1447,7 @@
       
       <!-- dataQuality tab -->
       <xsl:when test="$currTab='dataQuality'">
-        <xsl:apply-templates mode="elementEP" select="gmd:dataQualityInfo|geonet:child[string(@name)='dataQualityInfo']">
+        <xsl:apply-templates mode="elementEP" select="gvq:dataQualityInfo|geonet:child[string(@name)='dataQualityInfo']">
           <xsl:with-param name="schema" select="$schema"/>
           <xsl:with-param name="edit"   select="$edit"/>
         </xsl:apply-templates>
@@ -1625,9 +1625,9 @@
         <xsl:with-param name="id" select="generate-id(/root/gui/schemas/iso19139/labels/element[@name='gmd:LI_Lineage']/label)"/>
         <xsl:with-param name="content">
 
-          <xsl:for-each select="gmd:dataQualityInfo/gmd:DQ_DataQuality">
-            <xsl:apply-templates mode="elementEP" select="gmd:scope|geonet:child[string(@name)='scope']
-              |gmd:lineage|geonet:child[string(@name)='lineage']">
+          <xsl:for-each select="gvq:dataQualityInfo/gvq:GVQ_DataQuality">
+            <xsl:apply-templates mode="elementEP" select="gmd19157:scope|geonet:child[string(@name)='scope']
+              |gmd19157:lineage|geonet:child[string(@name)='lineage']">
               <xsl:with-param name="schema" select="$schema"/>
               <xsl:with-param name="edit"   select="$edit"/>
             </xsl:apply-templates>
@@ -1637,7 +1637,7 @@
         <xsl:with-param name="schema" select="$schema"/>
         <xsl:with-param name="group" select="/root/gui/strings/dataQualityTab"/>
         <xsl:with-param name="edit" select="$edit"/>
-        <xsl:with-param name="realname"   select="'gmd:DataQualityInfo'"/>
+        <xsl:with-param name="realname"   select="'gvq:DataQualityInfo'"/>
       </xsl:call-template>
 
     <!-- referenceSystemInfo in its own box -->
@@ -1773,7 +1773,7 @@
       |gmd:referenceSystemInfo|geonet:child[string(@name)='referenceSystemInfo']
       |gmd:contentInfo|geonet:child[string(@name)='contentInfo']
       |gmd:distributionInfo|geonet:child[string(@name)='distributionInfo']
-      |gmd:dataQualityInfo|geonet:child[string(@name)='dataQualityInfo']
+      |gvq:dataQualityInfo|geonet:child[string(@name)='dataQualityInfo']
       |gmd:portrayalCatalogueInfo|geonet:child[string(@name)='portrayalCatalogueInfo']
       |gmd:metadataConstraints|geonet:child[string(@name)='metadataConstraints']
       |gmd:applicationSchemaInfo|geonet:child[string(@name)='applicationSchemaInfo']
@@ -1970,7 +1970,7 @@
       <xsl:with-param name="flat"   select="$flat"/>
     </xsl:apply-templates>
     
-    <xsl:apply-templates mode="elementEP" select="gmd:dataQualityInfo|geonet:child[string(@name)='dataQualityInfo']">
+    <xsl:apply-templates mode="elementEP" select="gvq:dataQualityInfo|geonet:child[string(@name)='dataQualityInfo']">
       <xsl:with-param name="schema" select="$schema"/>
       <xsl:with-param name="edit"   select="$edit"/>
       <xsl:with-param name="flat"   select="$flat"/>
