@@ -2461,7 +2461,7 @@
 
 
 		<xsl:if test="$edit=false()">
-			<xsl:if test="count(gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:protocol/gco:CharacterString[contains(string(.),'download')])>1 and
+			<xsl:if test="count(gmd:MD_DigitalTransferOptions/gmd:onLine/updated19115:CI_OnlineResource/gmd:protocol/gco:CharacterString[contains(string(.),'download')])>1 and
 							/root/*[name(.)='gvq:GVQ_Metadata' or @gco:isoType='gvq:GVQ_Metadata']/geonet:info/download='true'">
 				<xsl:call-template name="complexElementGui">
 					<xsl:with-param name="title" select="/root/gui/strings/downloadSummary"/>
@@ -2568,7 +2568,7 @@
 	<!-- online resources -->
 	<!-- ============================================================================= -->
 
-	<xsl:template mode="iso19139.geoviqua" match="gmd:CI_OnlineResource" priority="2">
+	<xsl:template mode="iso19139.geoviqua" match="updated19115:CI_OnlineResource" priority="2">
 		<xsl:param name="schema"/>
 		<xsl:param name="edit"/>
 
@@ -2653,6 +2653,10 @@
 					<xsl:with-param name="edit"   select="true()"/>
 				</xsl:apply-templates>
 
+				<xsl:apply-templates mode="elementEP" select="updated19115:protocolRequest">
+					<xsl:with-param name="schema" select="$schema"/>
+					<xsl:with-param name="edit"   select="true()"/>
+				</xsl:apply-templates>
 
 				<xsl:apply-templates mode="elementEP" select="gmd:applicationProfile|geonet:child[string(@name)='applicationProfile']">
 					<xsl:with-param name="schema" select="$schema"/>
@@ -2704,7 +2708,7 @@
 	<!-- online resources: WMS get map -->
 	<!-- ============================================================================= -->
 
-	<xsl:template mode="iso19139.geoviqua" match="gmd:CI_OnlineResource[starts-with(gmd:protocol/gco:CharacterString,'OGC:WMS-') and contains(gmd:protocol/gco:CharacterString,'-get-map') and gmd:name]|gmd:CI_OnlineResource[gmd:protocol/gco:CharacterString = 'OGC:WMS' and string(gmd:name/gco:CharacterString)]" priority="2">
+	<xsl:template mode="iso19139.geoviqua" match="updated19115:CI_OnlineResource[starts-with(gmd:protocol/gco:CharacterString,'OGC:WMS-') and contains(gmd:protocol/gco:CharacterString,'-get-map') and gmd:name]|updated19115:CI_OnlineResource[gmd:protocol/gco:CharacterString = 'OGC:WMS' and string(gmd:name/gco:CharacterString)]" priority="2">
 		<xsl:param name="schema"/>
 		<xsl:param name="edit"/>
 		<xsl:variable name="metadata_id" select="/root/*[name(.)='gvq:GVQ_Metadata' or @gco:isoType='gvq:GVQ_Metadata']/geonet:info/id" />
@@ -2784,7 +2788,7 @@
 	<!-- online resources: WMS get capabilities -->
 	<!-- ============================================================================= -->
 
-	<xsl:template mode="iso19139.geoviqua" match="gmd:CI_OnlineResource[starts-with(gmd:protocol/gco:CharacterString,'OGC:WMS-') and contains(gmd:protocol/gco:CharacterString,'-get-capabilities')]|gmd:CI_OnlineResource[gmd:protocol/gco:CharacterString = 'OGC:WMS' and not(string(gmd:name/gco:CharacterString))]" priority="2">
+	<xsl:template mode="iso19139.geoviqua" match="updated19115:CI_OnlineResource[starts-with(gmd:protocol/gco:CharacterString,'OGC:WMS-') and contains(gmd:protocol/gco:CharacterString,'-get-capabilities')]|updated19115:CI_OnlineResource[gmd:protocol/gco:CharacterString = 'OGC:WMS' and not(string(gmd:name/gco:CharacterString))]" priority="2">
 		<xsl:param name="schema"/>
 		<xsl:param name="edit"/>
 		<xsl:variable name="linkage" select="gmd:linkage/gmd:URL" />
@@ -2821,7 +2825,7 @@
 		</xsl:choose>
 	</xsl:template>
 
-	<xsl:template mode="iso19139.geoviqua" match="gmd:CI_OnlineResource[not(string(gmd:protocol/gco:CharacterString)) and contains(upper-case(gmd:linkage/gmd:URL),'SERVICE=WMS')]" priority="2">
+	<xsl:template mode="iso19139.geoviqua" match="updated19115:CI_OnlineResource[not(string(gmd:protocol/gco:CharacterString)) and contains(upper-case(gmd:linkage/gmd:URL),'SERVICE=WMS')]" priority="2">
 		<xsl:param name="schema"/>
 		<xsl:param name="edit"/>
 		<xsl:variable name="linkage" select="gmd:linkage/gmd:URL" />
@@ -2861,7 +2865,7 @@
 	<!-- online resources: ARCIMS -->
 	<!-- ============================================================================= -->
 
-	<xsl:template mode="iso19139.geoviqua" match="gmd:CI_OnlineResource[starts-with(gmd:protocol/gco:CharacterString,'ESRI:AIMS-') and contains(gmd:protocol/gco:CharacterString,'-get-image') and gmd:name]" priority="2">
+	<xsl:template mode="iso19139.geoviqua" match="updated19115:CI_OnlineResource[starts-with(gmd:protocol/gco:CharacterString,'ESRI:AIMS-') and contains(gmd:protocol/gco:CharacterString,'-get-image') and gmd:name]" priority="2">
 		<xsl:param name="schema"/>
 		<xsl:param name="edit"/>
 		<xsl:variable name="linkage" select="gmd:linkage/gmd:URL" />
@@ -2899,7 +2903,7 @@
 	<!-- online resources: download -->
 	<!-- ============================================================================= -->
 
-	<xsl:template mode="iso19139.geoviqua" match="gmd:CI_OnlineResource[matches(gmd:protocol/gco:CharacterString,'^WWW:DOWNLOAD-.*-http--download.*') and gmd:name]" priority="2">
+	<xsl:template mode="iso19139.geoviqua" match="updated19115:CI_OnlineResource[matches(gmd:protocol/gco:CharacterString,'^WWW:DOWNLOAD-.*-http--download.*') and gmd:name]" priority="2">
 		<xsl:param name="schema"/>
 		<xsl:param name="edit"/>
 		<xsl:variable name="download_check"><xsl:text>&amp;fname=&amp;access</xsl:text></xsl:variable>
@@ -3001,13 +3005,14 @@
 	<!-- name for onlineresource only -->
 	<!-- ===================================================================== -->
 
-	<xsl:template mode="iso19139.geoviqua" match="gmd:name[name(..)='gmd:CI_OnlineResource']" priority="2">
+	<xsl:template mode="iso19139.geoviqua" match="gmd:name[name(..)='updated19115:CI_OnlineResource']" priority="2">
 		<xsl:param name="schema"/>
 		<xsl:param name="edit"/>
 
 		<xsl:choose>
 			<xsl:when test="$edit=true()">
 				<xsl:variable name="protocol" select="../gmd:protocol/gco:CharacterString"/>
+				<xsl:variable name="protocolRequest" select="../gmd:protocolRequest/gco:CharacterString"/>
 				<xsl:variable name="pref" select="../gmd:protocol/gco:CharacterString/geonet:element/@ref"/>
 				<xsl:variable name="ref" select="gco:CharacterString/geonet:element/@ref|gmx:MimeFileType/geonet:element/@ref"/>
 				<xsl:variable name="value" select="gco:CharacterString|gmx:MimeFileType"/>
@@ -3177,8 +3182,9 @@
 			<xsl:with-param name="info" select="$info"/>
 		</xsl:apply-templates>
 
-		<xsl:for-each select="gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource">
+		<xsl:for-each select="gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/updated19115:CI_OnlineResource">
 			<xsl:variable name="protocol" select="gmd:protocol[1]/gco:CharacterString"/>
+			<xsl:variable name="protocolRequest" select="updated19115:protocolRequest[1]/gco:CharacterString"/>
 			<xsl:variable name="linkage"  select="normalize-space(gmd:linkage/gmd:URL)"/>
 			<xsl:variable name="name">
 				<xsl:choose>
