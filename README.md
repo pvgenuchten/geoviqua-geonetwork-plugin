@@ -15,9 +15,17 @@ Alternatively, you could clone the repo directly via Git:
 	
 ## Configuration ##
 
-### Enable Metadata Export Services ###
+After installing the schema plugin, some additional configuration is required so that the plugin functions optimally. Please follow the steps below.
 
-You must configure your GeoNetwork installation to expose additional metadata conversion services so that, at a minimum, users can download GeoViQua metadata records directly from the GeoNetwork catalog as XML. `schema-conversions.xml` lists the available converters provided by this plugin.
+### 1. Enable XLink Resolver ###
+
+GeoNetwork's system configuration must be updated to enable the XLink Resolver so elements that use xlinks are displayed correctly when viewing metadata.
+
+Please reference the [GeoNetwork user documentation][5] on how to update the system configuration, ensuring that the checkbox under XLink Resolver is ticked and that the configuration is then saved.
+
+### 2. Enable Metadata Export Services ###
+
+Additional metadata conversion services must be exposed so that, at a minimum, users can download GeoViQua metadata records directly from the GeoNetwork catalog as XML. `schema-conversions.xml` lists the available converters provided by this plugin.
 
 To enable the export of GeoViQua documents, edit `INSTALL_DIR/web/geonetwork/WEB-INF/config-export.xml` to register the xml_geoviqua converter:
 ```xml
@@ -69,4 +77,5 @@ For anonymous users and web services, the publish privilege should be enabled fo
 [1]: http://geonetwork-opensource.org/manuals/2.8.0/eng/users/managing_metadata/schemas/index.html
 [2]: https://github.com/lushc/geoviqua-geonetwork-plugin/archive/2.8.x-dev.zip
 [3]: http://schemas.geoviqua.org/GVQ/4.0/
-[4]: http://www.geonetwork-opensource.org/ 
+[4]: http://www.geonetwork-opensource.org/
+[5]: http://geonetwork-opensource.org/manuals/2.8.0/eng/users/admin/configuration/index.html
