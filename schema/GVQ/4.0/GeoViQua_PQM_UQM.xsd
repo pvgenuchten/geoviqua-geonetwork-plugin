@@ -1,42 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<!--Created with Liquid XML Studio Developer Edition (Education) 9.1.11.3570 (http://www.liquid-technologies.com)-->
-<xs:schema xmlns:xlink="http://www.w3.org/1999/xlink" 
-xmlns:gco="http://www.isotc211.org/2005/gco" 
-
-xmlns:gmd19157="http://www.geoviqua.org/gmd19157" 
-xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/4.0" 
-xmlns:gmd="http://www.isotc211.org/2005/gmd" 
-xmlns:updated19115="http://www.geoviqua.org/19115_updates" 
-targetNamespace="http://www.geoviqua.org/QualityInformationModel/4.0"  
-xmlns:xs="http://www.w3.org/2001/XMLSchema" 
-elementFormDefault="qualified" 
-version="4.0.0">
-    
+<!--Created with Liquid XML Studio 2012 Developer Edition 10.1.2.4113 (http://www.liquid-technologies.com)-->
+<xs:schema xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmd19157="http://www.geoviqua.org/gmd19157" xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/4.0" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:updated19115="http://www.geoviqua.org/19115_updates" elementFormDefault="qualified" targetNamespace="http://www.geoviqua.org/QualityInformationModel/4.0" version="4.0.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <!-- ================================== Imports ================================== -->
-    
     <!--  Online schema location - 2007 ISO versions  -->
     <xs:import schemaLocation="../../ISO/19139/20070417/gmd/gmd.xsd" namespace="http://www.isotc211.org/2005/gmd" />
     <xs:import schemaLocation="../../ISO/19139/20070417/gco/gco.xsd" namespace="http://www.isotc211.org/2005/gco" />
     <xs:import schemaLocation="../../ISO/19139/20120707_GVQ/19115_updates.xsd" namespace="http://www.geoviqua.org/19115_updates" />
     <xs:import schemaLocation="../../ISO/19157/20120707_GVQ/19157_DataQuality.xsd" namespace="http://www.geoviqua.org/gmd19157" />
-    <xs:include schemaLocation="GeoViQua_DataQuality.xsd"/>
-    
+    <xs:include schemaLocation="GeoViQua_DataQuality.xsd" />
     <!-- ########################################################################### -->
     <!-- ########################################################################### -->
     <!-- ================================== Classes ================================= -->
-     <xs:complexType name="GVQ_Metadata_Type">
-		<xs:complexContent>
-			<xs:extension base="gmd:MD_Metadata_Type">
-				<xs:sequence>
-					<xs:element name="dataQualityInfo" type="gmd19157:DQ_DataQuality_PropertyType" minOccurs="0" maxOccurs="unbounded"/>	
-                    <xs:element name="userFeedback" type="gvq:GVQ_FeedbackCollection_PropertyType" minOccurs="0" maxOccurs="unbounded"/>
-				</xs:sequence>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
-
+    <xs:complexType name="GVQ_Metadata_Type">
+        <xs:complexContent>
+            <xs:extension base="gmd:MD_Metadata_Type">
+                <xs:sequence>
+                    <xs:element name="dataQualityInfo" type="gmd19157:DQ_DataQuality_PropertyType" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="userFeedback" type="gvq:GVQ_FeedbackCollection_PropertyType" minOccurs="0" maxOccurs="unbounded" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <!-- ........................................................................ -->
-    <xs:element name="GVQ_Metadata" type="gvq:GVQ_Metadata_Type" substitutionGroup="gmd:MD_Metadata"/>
+    <xs:element name="GVQ_Metadata" type="gvq:GVQ_Metadata_Type" substitutionGroup="gmd:MD_Metadata" />
     <!-- ........................................................................ -->
     <xs:complexType name="GVQ_Metadata_PropertyType">
         <xs:sequence minOccurs="0">
@@ -45,48 +31,46 @@ version="4.0.0">
         <xs:attributeGroup ref="gco:ObjectReference" />
         <xs:attribute ref="gco:nilReason" />
     </xs:complexType>
-    
     <!-- =================================================================== -->
     <xs:complexType name="GVQ_DataIdentification_Type">
-		<xs:complexContent>
-			<xs:extension base="gmd:MD_DataIdentification_Type">
-				<xs:sequence>
-					<xs:element name="referenceDoc" type="gvq:GVQ_Publication_PropertyType" minOccurs="1" maxOccurs="unbounded"/>				
-				</xs:sequence>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
-	<!-- ........................................................................ -->
-	<xs:element name="GVQ_DataIdentification" type="gvq:GVQ_DataIdentification_Type" substitutionGroup="gmd:AbstractMD_Identification"/>
-	<!-- ........................................................................ -->
-	<xs:complexType name="GVQ_DataIdentification_PropertyType">
-		<xs:sequence minOccurs="0">
-			<xs:element ref="gvq:GVQ_DataIdentification"/>
-		</xs:sequence>
-		<xs:attributeGroup ref="gco:ObjectReference"/>
-		<xs:attribute ref="gco:nilReason"/>
-	</xs:complexType>
-    
+        <xs:complexContent>
+            <xs:extension base="gmd:MD_DataIdentification_Type">
+                <xs:sequence>
+                    <xs:element name="referenceDoc" type="gvq:GVQ_Publication_PropertyType" minOccurs="1" maxOccurs="unbounded" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <!-- ........................................................................ -->
+    <xs:element name="GVQ_DataIdentification" type="gvq:GVQ_DataIdentification_Type" substitutionGroup="gmd:AbstractMD_Identification" />
+    <!-- ........................................................................ -->
+    <xs:complexType name="GVQ_DataIdentification_PropertyType">
+        <xs:sequence minOccurs="0">
+            <xs:element ref="gvq:GVQ_DataIdentification" />
+        </xs:sequence>
+        <xs:attributeGroup ref="gco:ObjectReference" />
+        <xs:attribute ref="gco:nilReason" />
+    </xs:complexType>
     <xs:complexType name="GVQ_Usage_Type">
-		<xs:complexContent>
-			<xs:extension base="gmd:MD_Usage_Type">
-				<xs:sequence>
-					<xs:element name="referenceDoc" type="gvq:GVQ_Publication_PropertyType" minOccurs="1" maxOccurs="unbounded"/>				
-				</xs:sequence>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
-	<!-- ........................................................................ -->
-	<xs:element name="GVQ_Usage" type="gvq:GVQ_Usage_Type" substitutionGroup="gmd:MD_Usage"/>
-	<!-- ........................................................................ -->
-	<xs:complexType name="GVQ_Usage_PropertyType">
-		<xs:sequence minOccurs="0">
-			<xs:element ref="gvq:GVQ_Usage"/>
-		</xs:sequence>
-		<xs:attributeGroup ref="gco:ObjectReference"/>
-		<xs:attribute ref="gco:nilReason"/>
-	</xs:complexType>
-    
+        <xs:complexContent>
+            <xs:extension base="gmd:MD_Usage_Type">
+                <xs:sequence>
+                    <xs:element name="referenceDoc" type="gvq:GVQ_Publication_PropertyType" minOccurs="1" maxOccurs="unbounded" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <!-- ........................................................................ -->
+    <xs:element name="GVQ_Usage" type="gvq:GVQ_Usage_Type" substitutionGroup="gmd:MD_Usage" />
+    <!-- ........................................................................ -->
+    <xs:complexType name="GVQ_Usage_PropertyType">
+        <xs:sequence minOccurs="0">
+            <xs:element ref="gvq:GVQ_Usage" />
+        </xs:sequence>
+        <xs:attributeGroup ref="gco:ObjectReference" />
+        <xs:attribute ref="gco:nilReason" />
+    </xs:complexType>
+    <xs:element name="ratingCount" type="gvq:GVQ_FeedbackSummaryRatingCount_Type" />
     <!-- =========================================================================== -->
     <!-- =========== Feedback model elements: user quality model ============== -->
     <!-- =========================================================================== -->
@@ -263,7 +247,7 @@ The mime is used to infer additional processing which may be required for proper
                     <xs:documentation>The application domains a user considers him/herself to work in.This should map to a concept such as those in GEMET.</xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="expertiseLevel" type="gvq:GVQ_Rating_1to5_Type" minOccurs="0" maxOccurs="1">
+            <xs:element name="expertiseLevel" type="gvq:GVQ_Rating_1to5_Type" minOccurs="1" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>This refers to this user's expertise level in this particular context, will be restricted between 1 and 5</xs:documentation>
                 </xs:annotation>
@@ -297,23 +281,112 @@ The mime is used to infer additional processing which may be required for proper
         </xs:sequence>
     </xs:complexType>
     <!-- =========================================================================== -->
+    <xs:element name="GVQ_FeedbackSummaryRatingCount" type="gvq:GVQ_FeedbackSummaryRatingCount_Type" />
+    <!-- ........................................................................ -->
+    <xs:complexType name="GVQ_FeedbackSummaryRatingCount_Type">
+        <xs:sequence>
+            <!-- TODO - should 'level' be an attribute? -->
+            <xs:element name="level1" type="xs:integer" minOccurs="1" maxOccurs="1" />
+            <xs:element name="level2" type="xs:integer" minOccurs="1" maxOccurs="1" />
+            <xs:element name="level3" type="xs:integer" minOccurs="1" maxOccurs="1" />
+            <xs:element name="level4" type="xs:integer" minOccurs="1" maxOccurs="1" />
+            <xs:element name="level5" type="xs:integer" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+    <!-- =========================================================================== -->
+    <xs:element name="GVQ_FeedbackSummaryItemAggregation" type="gvq:GVQ_FeedbackSummaryItemAggregation_Type" />
+    <!-- ........................................................................ -->
+    <xs:complexType name="GVQ_FeedbackSummaryItemAggregation_Type">
+        <xs:sequence>
+            <xs:element name="value" type="xs:string" minOccurs="1" maxOccurs="1" />
+            <xs:element name="average" type="xs:float" minOccurs="0" maxOccurs="1" />
+            <xs:element name="count" type="xs:integer" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+    <!-- =========================================================================== -->
+    <xs:element name="GVQ_FeedbackSummaryAggregation" type="gvq:GVQ_FeedbackSummaryAggregation_Type" />
+    <!-- ........................................................................ -->
+    <xs:complexType name="GVQ_FeedbackSummaryAggregation_Type">
+        <xs:sequence>
+            <xs:element name="category" type="gvq:GVQ_FeedbackSummaryItemAggregation_Type" minOccurs="1" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+    <!-- =========================================================================== -->
+    <xs:element name="GVQ_FeedbackSummary" type="gvq:GVQ_FeedbackSummary_Type" />
+    <!-- ........................................................................ -->
+    <xs:complexType name="GVQ_FeedbackSummary_Type">
+        <xs:annotation>
+            <xs:documentation>An aggregation of all numerical fields of a feedback collection concerning a particular item that is reviewed.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="itemUnderReview" type="updated19115:MD_Identifier_PropertyType" minOccurs="1" maxOccurs="1" />
+            <xs:element name="averageRating" type="xs:decimal" />
+            <xs:element name="numberOfRatings" type="xs:integer" />
+            <xs:element name="numberOfFeedbackItems" type="xs:integer" />
+            <!-- the above counts can be derived from the expertise-level breakdown, but are here for convenience -->
+            <xs:element name="ratingsByLevel" type="gvq:GVQ_FeedbackSummaryRatingCount_Type" />
+            <xs:element name="numberOfUserComments" type="xs:integer" />
+            <xs:element name="averageUserExpertiseLevel" type="xs:decimal" minOccurs="0" />
+            <xs:element name="latestReview" type="xs:date" minOccurs="0" />
+            <xs:element name="numberOfPublications" type="xs:integer" minOccurs="0" />
+            
+            <xs:element name="numberOfSecondaryTargets" type="xs:integer" minOccurs="0" />
+            <xs:element name="numberOfSupplementaryTargets" type="xs:integer" minOccurs="0" />
+            <xs:element name="numberOfUsageReports" type="xs:integer" minOccurs="0" />
+            <xs:element name="domainUsageCount" type="gvq:GVQ_FeedbackSummaryAggregation_Type" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="tagCount" type="gvq:GVQ_FeedbackSummaryAggregation_Type" minOccurs="0" maxOccurs="1" />
+            <xs:element name="userRoleCount" type="gvq:GVQ_FeedbackSummaryAggregation_Type" minOccurs="0" maxOccurs="1" />
+            <xs:element name="userRatingsByExpertiseLevel" type="gvq:GVQ_FeedbackSummaryAggregation_Type" minOccurs="1" maxOccurs="unbounded" />
+            <xs:element name="feedbackItemsByExpertiseLevel" type="gvq:GVQ_FeedbackSummaryAggregation_Type" minOccurs="1" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+    <!-- =========================================================================== -->
+    <xs:element name="GVQ_ResponsePagination" type="gvq:GVQ_ResponsePagination_Type" />
+    <!-- ........................................................................ -->
+    <xs:complexType name="GVQ_ResponsePagination_Type">
+        <xs:annotation>
+            <xs:documentation>Pagination for a feedback collection.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <!-- TODO do we remove the element below? -->
+            <xs:element name="count" type="xs:integer" minOccurs="1" maxOccurs="1" />
+            <xs:element name="limit" type="xs:integer" minOccurs="1" maxOccurs="1" />
+            <xs:element name="offset" type="xs:integer" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+    <!-- =========================================================================== -->
     <xs:element name="GVQ_FeedbackCollection" type="gvq:GVQ_FeedbackCollection_Type" />
     <!-- ........................................................................ -->
     <xs:complexType name="GVQ_FeedbackCollection_Type">
         <xs:annotation>
-            <xs:documentation>A collection of feedback from a query or submission. It acts as the root node of any feedback document.</xs:documentation>
+            <xs:documentation>A collection of feedback from a query or submission. Each feedback collection should include information about a sibgle resource. If feedback for multiple datasets is retrieved from a query, then sevaral collections should be nested inside the GVQ_FeedbackResponse element.</xs:documentation>
         </xs:annotation>
         <xs:sequence>
+            <xs:element name="itemUnderReview" type="updated19115:MD_Identifier_PropertyType" minOccurs="1" maxOccurs="1" />
             <xs:element name="item" type="gvq:GVQ_FeedbackItem_Type" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="pagination" type="gvq:GVQ_ResponsePagination_Type" minOccurs="0" maxOccurs="1" />
+            <xs:element name="summary" type="gvq:GVQ_FeedbackSummary_Type" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+    <!-- =========================================================================== -->
+    <xs:element name="GVQ_FeedbackResponse" type="gvq:GVQ_FeedbackResponse_Type" />
+    <!-- ........................................................................ -->
+    <xs:complexType name="GVQ_FeedbackResponse_Type">
+        <xs:annotation>
+            <xs:documentation>A container for collections of feedback from a separate queries. It acts as the root node of any feedback document.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <!-- TODO should the collections in this response actually just be the 'Type', not the 'PropertyType'? If they are going to 
+            be put inside a GVQ_Metadata element, they need to be 'PT' so that is what I have made them...-->
+            <xs:element name="collection" type="gvq:GVQ_FeedbackCollection_PropertyType" minOccurs="1" maxOccurs="unbounded" />
         </xs:sequence>
     </xs:complexType>
     <!-- ........................................................................ -->
-	<xs:complexType name="GVQ_FeedbackCollection_PropertyType">
-		<xs:sequence minOccurs="0">
-			<xs:element ref="gvq:GVQ_FeedbackCollection"/>
-		</xs:sequence>
-		<xs:attributeGroup ref="gco:ObjectReference"/>
-		<xs:attribute ref="gco:nilReason"/>
-	</xs:complexType>
-    
+    <xs:complexType name="GVQ_FeedbackCollection_PropertyType">
+        <xs:sequence minOccurs="0">
+            <xs:element ref="gvq:GVQ_FeedbackCollection" />
+        </xs:sequence>
+        <xs:attributeGroup ref="gco:ObjectReference" />
+        <xs:attribute ref="gco:nilReason" />
+    </xs:complexType>
 </xs:schema>
