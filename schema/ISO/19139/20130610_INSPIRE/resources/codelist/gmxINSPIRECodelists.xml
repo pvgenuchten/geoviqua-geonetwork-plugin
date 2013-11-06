@@ -19,7 +19,7 @@
   <codelistItem> 
     <CodeListDictionary  gml:id="CI_OnLineFunctionCode">
         <gml:description>function performed by the resource</gml:description>
-		<gml:identifier codeSpace="INSPIRE_SDS">GVQ_PublicationPurposeCode</gml:identifier>
+		<gml:identifier codeSpace="INSPIRE_SDS">CI_OnLineFunctionCode</gml:identifier>
       <codeEntry> 
         <CodeDefinition gml:id="CI_OnLineFunctionCode_accessPoint"> 
           <gml:description>used to describe an access point of the service</gml:description> 
