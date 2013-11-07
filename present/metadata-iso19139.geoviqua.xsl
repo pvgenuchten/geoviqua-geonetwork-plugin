@@ -31,7 +31,7 @@
 	<!-- load INSPIRE codelists -->
 	<xsl:variable name="codelistsgmdINSPIRE" select="document('../schema/ISO/19139/20130610_INSPIRE/resources/codelist/gmxINSPIRECodelists.xml')"/>
 	<!-- load iso19139 codelists -->
-	<xsl:variable name="codelistsgmx19139" select="document('../schema/ISO/19139/20070417/resources/codelist/gmxCodelists.xml')"/>
+	<xsl:variable name="codelistsgmx19139" select="document('../schema/ISO/19139/20070417/resources/Codelist/gmxCodelists.xml')"/>
 
 	<!-- deep-copy each set of codelists to combine them -->
 	<xsl:variable name="codelistsCopy">
