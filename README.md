@@ -11,7 +11,7 @@ To install the schema plugin manually, the zip archive must be extracted to GeoN
 Alternatively, you could clone the repo directly via Git:
 
 	cd INSTALL_DIR/web/geonetwork/WEB-INF/data/config/schema_plugins
-	git clone https://github.com/lushc/geoviqua-geonetwork-plugin.git iso19139.geoviqua
+	git clone https://github.com/GeoViQua/geoviqua-geonetwork-plugin.git -b 2.8.x-dev iso19139.geoviqua
 	
 ## Configuration ##
 
@@ -75,7 +75,7 @@ Users will then have the option to export GeoViQua documents as XML when viewing
 For anonymous users and web services, the publish privilege should be enabled for the "All" group.
 
 [1]: http://geonetwork-opensource.org/manuals/2.8.0/eng/users/managing_metadata/schemas/index.html
-[2]: https://github.com/lushc/geoviqua-geonetwork-plugin/archive/2.8.x-dev.zip
+[2]: https://github.com/GeoViQua/geoviqua-geonetwork-plugin/archive/2.8.x-dev.zip
 [3]: http://schemas.geoviqua.org/GVQ/4.0/
 [4]: http://www.geonetwork-opensource.org/
 [5]: http://geonetwork-opensource.org/manuals/2.8.0/eng/users/admin/configuration/index.html
