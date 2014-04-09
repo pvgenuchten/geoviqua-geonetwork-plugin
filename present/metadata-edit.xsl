@@ -13,7 +13,8 @@
   xmlns:exslt="http://exslt.org/common"
   exclude-result-prefixes="gmx xsi gmd gco gml gts srv xlink exslt geonet">
 
-  <xsl:import href="metadata-iso19139.geoviqua-view.xsl"/>
+  <xsl:import href="metadata-view.xsl"/>
+  <xsl:import href="metadata-utils.xsl"/>
 
   <!-- Use this mode on the root element to add hidden fields to the editor -->
   <xsl:template mode="schema-hidden-fields" match="gvq:GVQ_Metadata|*[@gco:isoType='gmd:MD_Metadata']" priority="2">
@@ -63,57 +64,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- =================================================================== -->
-  <!-- default: in simple mode just a flat list -->
-  <!-- =================================================================== -->
 
-  <xsl:template mode="iso19139" match="*|@*">
-    <xsl:param name="schema"/>
-    <xsl:param name="edit"/>
-    
-    <!-- do not show empty elements in view mode -->
-    <xsl:choose>
-      <xsl:when test="$edit=true()">
-        <xsl:apply-templates mode="element" select=".">
-          <xsl:with-param name="schema" select="$schema"/>
-          <xsl:with-param name="edit"   select="true()"/>
-          <xsl:with-param name="flat"   select="/root/gui/config/metadata-tab/*[name(.)=$currTab]/@flat"/>
-        </xsl:apply-templates>
-      </xsl:when>
-      
-      <xsl:otherwise>
-        <xsl:variable name="empty">
-          <xsl:apply-templates mode="iso19139IsEmpty" select="."/>
-        </xsl:variable>
-        
-        <xsl:if test="$empty!=''">
-          <xsl:apply-templates mode="element" select=".">
-            <xsl:with-param name="schema" select="$schema"/>
-            <xsl:with-param name="edit"   select="false()"/>
-            <xsl:with-param name="flat"   select="/root/gui/config/metadata-tab/*[name(.)=$currTab]/@flat"/>
-          </xsl:apply-templates>
-        </xsl:if>
-        
-      </xsl:otherwise>
-    </xsl:choose>
-      
-  </xsl:template>
-  
-  
-  <!--=====================================================================-->
-  <!-- these elements should not be displayed 
-    * do not display graphicOverview managed by GeoNetwork (ie. having a 
-    fileDescription set to thumbnail or large_thumbnail). Those thumbnails
-    are managed in then thumbnail popup. Others could be valid URL pointing to
-    an image available on the Internet.
-  -->
-  <!--=====================================================================
-  
-  <xsl:template mode="iso19139"
-    match="gmd:graphicOverview[gmd:MD_BrowseGraphic/gmd:fileDescription/gco:CharacterString='thumbnail' or gmd:MD_BrowseGraphic/gmd:fileDescription/gco:CharacterString='large_thumbnail']"
-    priority="20" />-->
-  
-  
   <!-- ===================================================================== -->
   <!-- these elements should be boxed -->
   <!-- ===================================================================== -->
@@ -134,572 +85,8 @@
     </xsl:apply-templates>
   </xsl:template>
   
-  <!-- ===================================================================== -->
-  <!-- some gco: elements and gmx:MimeFileType are swallowed -->
-  <!-- ===================================================================== -->
-
-  <xsl:template mode="iso19139" match="gmd:*[gco:Date|gco:DateTime|gco:Integer|gco:Decimal|gco:Boolean|gco:Real|gco:Measure|gco:Length|gco:Distance|gco:Angle|gco:Scale|gco:RecordType|gmx:MimeFileType]|
-                  srv:*[gco:Date|gco:DateTime|gco:Integer|gco:Decimal|gco:Boolean|gco:Real|gco:Measure|gco:Length|gco:Distance|gco:Angle|gco:Scale|gco:RecordType|gmx:MimeFileType]">
-    <xsl:param name="schema"/>
-    <xsl:param name="edit"/>
-    
-    <xsl:call-template name="iso19139String">
-      <xsl:with-param name="schema" select="$schema"/>
-      <xsl:with-param name="edit"   select="$edit"/>
-    </xsl:call-template>
-  </xsl:template>
   
-  <!-- ==================================================================== -->
-
-  <!-- Distance widget with value + uom attribute in one line.
-  Suggestion (from label files) update the value element. 
-  -->
-  <xsl:template mode="iso19139" match="gmd:distance" priority="2">
-    <xsl:param name="schema"/>
-    <xsl:param name="edit"/>
-    
-    <xsl:choose>
-      <xsl:when test="$edit=true()">
-        <xsl:variable name="text">
-          <xsl:variable name="ref" select="gco:Distance/geonet:element/@ref"/>
-          
-          <input type="number" class="md" name="_{$ref}" id="_{$ref}"  
-            onkeyup="validateNumber(this,true,true);"
-            onchange="validateNumber(this,true,true);"
-            value="{gco:Distance}" size="30"/>
-          
-          &#160;
-          <xsl:value-of select="/root/gui/schemas/iso19139/labels/element[@name = 'uom']/label"/>
-          &#160;
-          <input type="text" class="md" name="_{$ref}_uom" id="_{$ref}_uom"  
-            value="{gco:Distance/@uom}" style="width:30px;"/>
-          
-          <xsl:for-each select="gco:Distance">
-            <xsl:call-template name="helper">
-              <xsl:with-param name="schema" select="$schema"/>
-              <xsl:with-param name="attribute" select="false()"/>
-            </xsl:call-template>
-          </xsl:for-each>
-          
-        </xsl:variable>
-        
-        <xsl:apply-templates mode="simpleElement" select=".">
-          <xsl:with-param name="schema" select="$schema"/>
-          <xsl:with-param name="edit"   select="true()"/>
-          <xsl:with-param name="text"   select="$text"/>
-        </xsl:apply-templates>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:apply-templates mode="simpleElement" select=".">
-          <xsl:with-param name="schema"  select="$schema"/>
-          <xsl:with-param name="text">
-            <xsl:value-of select="gco:Distance"/>
-            <xsl:if test="gco:Distance/@uom"><xsl:text>&#160;</xsl:text>
-              <xsl:choose>
-                <xsl:when test="contains(gco:Distance/@uom, '#')">
-                  <a href="{gco:Distance/@uom}"><xsl:value-of select="substring-after(gco:Distance/@uom, '#')"/></a>
-                </xsl:when>
-                <xsl:otherwise><xsl:value-of select="gco:Distance/@uom"/></xsl:otherwise>
-              </xsl:choose>
-            </xsl:if>
-          </xsl:with-param>
-        </xsl:apply-templates>
-      </xsl:otherwise>
-    </xsl:choose>
-    
-  </xsl:template>
-  
-  <!-- ==================================================================== -->
-
-  <!--
-    OperatesOn element display or edit attribute uuidref. In edit mode
-    the metadata selection panel is provided to set the uuid.
-    In view mode, the title of the metadata is displayed.
-    
-    Note: it could happen that linked metadata record is not accessible
-    to current user. In such a situation, clicking the link will return
-    a privileges exception.
-    -->
-  <xsl:template mode="iso19139" match="srv:operatesOn|gmd:featureCatalogueCitation|gmd:source[name(parent::node())='gmd:LI_ProcessStep' or name(parent::node())='gmd:LI_Lineage']" priority="99">
-    <xsl:param name="schema"/>
-    <xsl:param name="edit"/>
-    <xsl:variable name="text">
-      
-      
-      <xsl:choose>
-        <xsl:when test="$edit=true()">
-          <xsl:variable name="ref" select="geonet:element/@ref"/>
-          <xsl:variable name="typeOfLink" select="if (local-name(.)='featureCatalogueCitation') then 'iso19110' else 'uuidref'"/>
-          
-          <input type="text" name="_{$ref}_uuidref" id="_{$ref}_uuidref" value="{./@uuidref}" size="20"
-            onfocus="javascript:Ext.getCmp('editorPanel').showLinkedMetadataSelectionPanel('{$ref}', 'uuidref', '{$typeOfLink}');"/>
-          <img src="../../images/find.png" alt="{/root/gui/strings/search}" title="{/root/gui/strings/search}"
-            onclick="javascript:Ext.getCmp('editorPanel').showLinkedMetadataSelectionPanel('{$ref}', 'uuidref', '{$typeOfLink}');" 
-            onmouseover="this.style.cursor='pointer';"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <a href="#" onclick="javascript:catalogue.metadataShow('{@uuidref}');return false;">
-            <xsl:call-template name="getMetadataTitle">
-              <xsl:with-param name="uuid" select="@uuidref"/>
-            </xsl:call-template>
-          </a>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    <xsl:apply-templates mode="simpleElement" select=".">
-      <xsl:with-param name="schema" select="$schema"/>
-      <xsl:with-param name="edit"   select="$edit"/>
-      <xsl:with-param name="text"   select="$text"/>
-      <xsl:with-param name="editAttributes" select="false()"/>
-    </xsl:apply-templates>
-<!--<xsl:apply-templates mode="iso19139" select="*">
-      <xsl:with-param name="schema" select="$schema"/>
-      <xsl:with-param name="edit"   select="$edit"/>
-    </xsl:apply-templates>-->
-  </xsl:template>
-
-
-
-    <!-- ============================================================================= -->
-    <!--   
-   Display a list of related resources to which the current service metadata operatesOn.
-   
-     Ie. User should define related metadata record using operatesOn elements and then if
-     needed, set a coupledResource to create a link to the data itself
-      (using layer name/feature type/coverage name as described in capabilities documents). 
-     
-     To create a relation best is using the related resources panel (see relatedResources 
-     template in metadata-iso19139-utils.xsl).
-      -->
-    <xsl:template mode="iso19139" match="srv:coupledResource/srv:SV_CoupledResource/srv:identifier" priority="200">
-        <xsl:param name="schema"/>
-        <xsl:param name="edit"/>
-
-        <xsl:choose>
-            <xsl:when test="$edit=true()">
-                <xsl:variable name="text">
-                    <xsl:variable name="ref" select="gco:CharacterString/geonet:element/@ref"/>
-                     <xsl:variable name="currentUuid" select="gco:CharacterString/text()"/>
-                    <input type="text" class="md" name="_{$ref}" id="_{$ref}" onchange="validateNonEmpty(this)" value="{$currentUuid}" size="30"/>
-                    <xsl:choose>
-                        <xsl:when test="count(//srv:operatesOn[@uuidref!=''])=0">
-                            <xsl:value-of select="/root/gui/strings/noOperatesOn"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <select onchange="javascript:Ext.getDom('_{$ref}').value=this.options[this.selectedIndex].value;" class="md">
-                                <option></option>
-                                <xsl:for-each select="//srv:operatesOn[@uuidref!='']">
-                                    <option value="{@uuidref}">
-                                      <xsl:if test="@uuidref = $currentUuid">
-                                        <xsl:attribute name="selected">selected</xsl:attribute>
-                                      </xsl:if>
-                                        <xsl:call-template name="getMetadataTitle">
-                                            <xsl:with-param name="uuid" select="@uuidref"/>
-                                        </xsl:call-template>
-                                    </option>
-                                </xsl:for-each>
-                            </select>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:variable>
-
-                <xsl:apply-templates mode="simpleElement" select=".">
-                    <xsl:with-param name="schema" select="$schema"/>
-                    <xsl:with-param name="edit"   select="true()"/>
-                    <xsl:with-param name="text"   select="$text"/>
-                </xsl:apply-templates>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:apply-templates mode="simpleElement" select=".">
-                    <xsl:with-param name="schema"  select="$schema"/>
-                    <xsl:with-param name="text">
-                      <a href="#" onclick="javascript:catalogue.metadataShow('{gco:CharacterString}');return false;">
-                        <xsl:call-template name="getMetadataTitle">
-                          <xsl:with-param name="uuid" select="gco:CharacterString"/>
-                        </xsl:call-template>
-                      </a>
-                    </xsl:with-param>
-                </xsl:apply-templates>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-
-
-
-
-  <!--
-    Create widget to handle editing of xsd:duration elements.
-    
-    Format: PnYnMnDTnHnMnS
-    
-    *  P indicates the period (required)
-    * nY indicates the number of years
-    * nM indicates the number of months
-    * nD indicates the number of days
-    * T indicates the start of a time section (required if you are going to specify hours, minutes, or seconds)
-    * nH indicates the number of hours
-    * nM indicates the number of minutes
-    * nS indicates the number of seconds
-    
-    TODO : onload, we should run validateNumber handler in order to change 
-    input class when needed.
-    
-  -->
-  <xsl:template mode="iso19139" match="gts:TM_PeriodDuration|gml:duration" priority="100">
-    <xsl:param name="schema" />
-    <xsl:param name="edit" />
-    
-    <!--Set default value -->
-    <xsl:variable name="p">
-      <xsl:choose>
-        <xsl:when test=".=''">P0Y0M0DT0H0M0S</xsl:when>
-        <xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    
-    <!-- Extract fragment -->
-    <xsl:variable name="NEG">
-      <xsl:choose>
-        <xsl:when test="starts-with($p, '-')">true</xsl:when>
-        <xsl:otherwise></xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    <xsl:variable name="Y" select="substring-before(substring-after($p, 'P'), 'Y')"/>
-    <xsl:variable name="M" select="substring-before(substring-after($p, 'Y'), 'M')"/>
-    <xsl:variable name="D" select="substring-before(substring-after($p, 'M'), 'DT')"/>
-    <xsl:variable name="H" select="substring-before(substring-after($p, 'DT'), 'H')"/>
-    <xsl:variable name="MI" select="substring-before(substring-after($p, 'H'), 'M')"/>
-    <xsl:variable name="S" select="substring-before(substring-after(substring-after($p,'M' ),'M' ), 'S')"/>
-    
-    <xsl:variable name="text">
-      <xsl:choose>
-        <xsl:when test="$edit=true()">
-          <xsl:variable name="ref" select="geonet:element/@ref"/>
-          
-          <input type="checkbox" id="N{$ref}" onchange="buildDuration('{$ref}');">
-            <xsl:if test="$NEG!=''"><xsl:attribute name="checked">checked</xsl:attribute></xsl:if>
-          </input>
-          <label for="N{$ref}"><xsl:value-of select="/root/gui/strings/durationSign"/></label><br/>
-          <xsl:value-of select="/root/gui/strings/durationNbYears"/><input type="text" id="Y{$ref}" class="small" value="{substring-before(substring-after($p, 'P'), 'Y')}" size="4" onchange="buildDuration('{$ref}');" onkeyup="validateNumber(this,true,false);"/>-
-          <xsl:value-of select="/root/gui/strings/durationNbMonths"/><input type="text" id="M{$ref}" class="small" value="{substring-before(substring-after($p, 'Y'), 'M')}" size="4" onchange="buildDuration('{$ref}');" onkeyup="validateNumber(this,true,false);"/>-
-          <xsl:value-of select="/root/gui/strings/durationNbDays"/><input type="text" id="D{$ref}" class="small" value="{substring-before(substring-after($p, 'M'), 'DT')}" size="4" onchange="buildDuration('{$ref}');" onkeyup="validateNumber(this,true,false);"/><br/>
-          <xsl:value-of select="/root/gui/strings/durationNbHours"/><input type="text" id="H{$ref}" class="small" value="{substring-before(substring-after($p, 'DT'), 'H')}" size="4" onchange="buildDuration('{$ref}');" onkeyup="validateNumber(this,true,false);"/>-
-          <xsl:value-of select="/root/gui/strings/durationNbMinutes"/><input type="text" id="MI{$ref}" class="small" value="{substring-before(substring-after($p, 'H'), 'M')}" size="4" onchange="buildDuration('{$ref}');" onkeyup="validateNumber(this,true,false);"/>-
-          <xsl:value-of select="/root/gui/strings/durationNbSeconds"/><input type="text" id="S{$ref}" class="small" value="{substring-before(substring-after(substring-after($p,'M' ),'M' ), 'S')}" size="4" onchange="buildDuration('{$ref}');" onkeyup="validateNumber(this,true,true);"/><br/>
-          <input type="hidden" name="_{$ref}" id="_{$ref}" value="{$p}" size="20"/><br/>
-          
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:if test="$NEG!=''">-</xsl:if><xsl:text> </xsl:text>
-          <xsl:value-of select="$Y"/><xsl:text> </xsl:text><xsl:value-of select="/root/gui/strings/durationYears"/><xsl:text>  </xsl:text>
-          <xsl:value-of select="$M"/><xsl:text> </xsl:text><xsl:value-of select="/root/gui/strings/durationMonths"/><xsl:text>  </xsl:text>
-          <xsl:value-of select="$D"/><xsl:text> </xsl:text><xsl:value-of select="/root/gui/strings/durationDays"/><xsl:text> / </xsl:text>
-          <xsl:value-of select="$H"/><xsl:text> </xsl:text><xsl:value-of select="/root/gui/strings/durationHours"/><xsl:text>  </xsl:text>
-          <xsl:value-of select="$MI"/><xsl:text> </xsl:text><xsl:value-of select="/root/gui/strings/durationMinutes"/><xsl:text>  </xsl:text>
-          <xsl:value-of select="$S"/><xsl:text> </xsl:text><xsl:value-of select="/root/gui/strings/durationSeconds"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    <xsl:apply-templates mode="simpleElement" select=".">
-      <xsl:with-param name="schema" select="$schema"/>
-      <xsl:with-param name="edit"   select="$edit"/>
-      <xsl:with-param name="text"   select="$text"/>
-    </xsl:apply-templates>
-  </xsl:template>
-
-    <!-- ==================================================================== -->
-
-  <xsl:template name="translatedString">
-      <xsl:param name="schema"/>
-      <xsl:param name="langId" />
-      <xsl:param name="edit" select="false()"/>
-      <xsl:param name="validator" />
-          <xsl:choose>
-              <xsl:when test="not(gco:*)">
-                  <xsl:for-each select="gmd:PT_FreeText">
-                      <xsl:call-template name="getElementText">
-                          <xsl:with-param name="edit" select="$edit" />
-                          <xsl:with-param name="schema" select="$schema" />
-                          <xsl:with-param name="langId" select="$langId" />
-                          <xsl:with-param name="validator" select="$validator" />
-                        </xsl:call-template>
-                    </xsl:for-each>
-                </xsl:when>
-              <xsl:otherwise>
-                  <xsl:for-each select="gco:*">
-                      <xsl:call-template name="getElementText">
-                            <xsl:with-param name="edit" select="$edit" />
-                            <xsl:with-param name="schema" select="$schema" />
-                            <xsl:with-param name="langId" select="$langId" />
-                            <xsl:with-param name="validator" select="$validator" />
-                        </xsl:call-template>
-                    </xsl:for-each>
-                </xsl:otherwise>
-            </xsl:choose>
-    </xsl:template>
-
-  <xsl:template name="iso19139String">
-    <xsl:param name="schema"/>
-    <xsl:param name="edit"/>
-    <xsl:param name="class" select="''"/>
-    <xsl:param name="langId" />
-    <xsl:param name="widget" />
-    <xsl:param name="validator" />
-
-    <xsl:variable name="title">
-      <xsl:call-template name="getTitle">
-        <xsl:with-param name="name"   select="name(.)"/>
-        <xsl:with-param name="schema" select="$schema"/>
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:variable name="helpLink">
-      <xsl:call-template name="getHelpLink">
-        <xsl:with-param name="name"   select="name(.)"/>
-        <xsl:with-param name="schema" select="$schema"/>
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:variable name="text">
-      <xsl:choose>
-        <xsl:when test="not($edit=true() and $widget)">
-          <!-- Having only gmd:PT_FreeText is allowed by schema.
-            So using a PT_FreeText to set a translation even
-            in main metadata language could be valid.-->
-          <xsl:call-template name="translatedString">
-            <xsl:with-param name="schema" select="$schema"/>
-            <xsl:with-param name="edit" select="$edit"/>
-            <xsl:with-param name="langId" select="$langId" />
-            <xsl:with-param name="validator" select="$validator"/>
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:copy-of select="$widget" />
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    <xsl:variable name="attrs">
-      <xsl:for-each select="gco:*/@*">
-        <xsl:value-of select="name(.)"/>
-      </xsl:for-each>
-    </xsl:variable>
-
-
-    <xsl:choose>
-    <xsl:when test="normalize-space($attrs)!=''">
-      <xsl:apply-templates mode="complexElement" select=".">
-        <xsl:with-param name="schema"   select="$schema"/>
-        <xsl:with-param name="edit"     select="$edit"/>
-        <xsl:with-param name="title"    select="$title"/>
-        <xsl:with-param name="helpLink" select="$helpLink"/>
-        <xsl:with-param name="content">
-
-        <!-- existing attributes -->
-        <xsl:for-each select="gco:*/@*">
-          <xsl:apply-templates mode="simpleElement" select=".">
-            <xsl:with-param name="schema" select="$schema"/>
-            <xsl:with-param name="edit"   select="$edit"/>
-          </xsl:apply-templates>
-        </xsl:for-each>
-
-        <!-- existing content -->
-        <xsl:apply-templates mode="simpleElement" select=".">
-          <xsl:with-param name="schema"   select="$schema"/>
-          <xsl:with-param name="edit"     select="$edit"/>
-          <xsl:with-param name="title"    select="$title"/>
-          <xsl:with-param name="helpLink" select="$helpLink"/>
-          <xsl:with-param name="text"     select="$text"/>
-        </xsl:apply-templates>
-        </xsl:with-param>
-      </xsl:apply-templates>
-    </xsl:when>
-    <xsl:otherwise>
-      <xsl:apply-templates mode="simpleElement" select=".">
-        <xsl:with-param name="schema"   select="$schema"/>
-        <xsl:with-param name="edit"     select="$edit"/>
-        <xsl:with-param name="title"    select="$title"/>
-        <xsl:with-param name="helpLink" select="$helpLink"/>
-        <xsl:with-param name="text"     select="$text"/>
-      </xsl:apply-templates>
-    </xsl:otherwise>
-    </xsl:choose>
-
-  </xsl:template>
-
-  <!-- ==================================================================== -->
-
-  <xsl:template mode="iso19139" match="gco:ScopedName|gco:LocalName">
-    <xsl:param name="schema"/>
-    <xsl:param name="edit"/>
-
-    <xsl:variable name="text">
-      <xsl:call-template name="getElementText">
-        <xsl:with-param name="edit"   select="$edit"/>
-        <xsl:with-param name="schema" select="$schema"/>
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:apply-templates mode="simpleElement" select=".">
-      <xsl:with-param name="schema"   select="$schema"/>
-      <xsl:with-param name="edit"     select="$edit"/>
-      <xsl:with-param name="title"    select="'Name'"/>
-      <xsl:with-param name="text"     select="$text"/>
-    </xsl:apply-templates>
-  </xsl:template>
-
-
-  <!-- GML time interval -->
-  <xsl:template mode="iso19139" match="gml:timeInterval">
-    <xsl:param name="schema"/>
-    <xsl:param name="edit"/>
-    
-    <xsl:choose>
-      <xsl:when test="$edit">
-        <xsl:apply-templates mode="simpleElement" select=".">
-          <xsl:with-param name="schema"   select="$schema"/>
-          <xsl:with-param name="edit"     select="$edit"/>
-          <xsl:with-param name="title"    select="/root/gui/schemas/iso19139/labels/element[@name='gml:timeInterval']/label"/>
-        </xsl:apply-templates>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:variable name="text">
-          <xsl:choose>
-            <xsl:when test="@radix and @factor"><xsl:value-of select=". * @factor div @radix"/>&#160;<xsl:value-of select="@unit"/></xsl:when>
-            <xsl:when test="@factor"><xsl:value-of select=". * @factor"/>&#160;<xsl:value-of select="@unit"/></xsl:when>
-            <xsl:when test="@radix"><xsl:value-of select=". div @radix"/>&#160;<xsl:value-of select="@unit"/></xsl:when>
-            <xsl:otherwise><xsl:value-of select="."/>&#160;<xsl:value-of select="@unit"/></xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable>
-        <xsl:apply-templates mode="simpleElement" select=".">
-          <xsl:with-param name="schema"   select="$schema"/>
-          <xsl:with-param name="edit"     select="$edit"/>
-          <xsl:with-param name="title"    select="/root/gui/schemas/iso19139/labels/element[@name='gml:timeInterval']/label"/>
-          <xsl:with-param name="text"     select="$text"/>
-        </xsl:apply-templates>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-  
-  <!-- Display element attributes only in edit mode 
-    * GML time interval 
-  -->
-  <xsl:template mode="simpleAttribute" match="gml:timeInterval/@*" priority="99">
-    <xsl:param name="schema"/>
-    <xsl:param name="edit"/>
-    
-    <xsl:choose>
-      <xsl:when test="$edit">
-        <xsl:call-template name="simpleAttribute">
-          <xsl:with-param name="schema" select="$schema"/>
-          <xsl:with-param name="edit" select="$edit"/>
-        </xsl:call-template>
-      </xsl:when>
-    </xsl:choose>
-  </xsl:template>
-  
-  <xsl:template mode="simpleAttribute" match="@xsi:type" priority="99"/>
-
-  <!-- ================================================================= -->
-  <!-- some elements that have both attributes and content               -->
-  <!-- ================================================================= -->
-
-  <xsl:template mode="iso19139" match="gml:identifier|gml:axisDirection|gml:descriptionReference">
-    <xsl:param name="schema"/>
-    <xsl:param name="edit"/>
-
-    <xsl:apply-templates mode="complexElement" select=".">
-      <xsl:with-param name="schema"   select="$schema"/>
-      <xsl:with-param name="edit"     select="$edit"/>
-      <xsl:with-param name="content">
-    
-        <!-- existing attributes -->
-        <xsl:apply-templates mode="simpleElement" select="@*">
-          <xsl:with-param name="schema" select="$schema"/>
-          <xsl:with-param name="edit"   select="$edit"/>
-        </xsl:apply-templates>
-    
-        <!-- existing content -->
-        <xsl:apply-templates mode="simpleElement" select=".">
-          <xsl:with-param name="schema" select="$schema"/>
-          <xsl:with-param name="edit"   select="$edit"/>
-        </xsl:apply-templates>
-
-      </xsl:with-param>
-    </xsl:apply-templates>
-  </xsl:template>
-
-
-  <!-- gmx:FileName could be used as substitution of any
-    gco:CharacterString. To turn this on add a schema 
-    suggestion.
-    -->
-  <xsl:template mode="iso19139" name="file-upload" match="*[gmx:FileName]">
-    <xsl:param name="schema"/>
-    <xsl:param name="edit"/>
-    
-    <xsl:variable name="src" select="gmx:FileName/@src"/>
-    
-    <xsl:call-template name="file-or-logo-upload">
-      <xsl:with-param name="schema" select="$schema"/>
-      <xsl:with-param name="edit" select="$edit"/>
-      <xsl:with-param name="ref" select="gmx:FileName/geonet:element/@ref"/>
-      <xsl:with-param name="value" select="gmx:FileName"/>
-      <xsl:with-param name="src" select="$src"/>
-      <xsl:with-param name="delButton" select="normalize-space(gmx:FileName)!=''"/>
-      <xsl:with-param name="setButton" select="normalize-space(gmx:FileName)=''"/>
-      <xsl:with-param name="visible" select="false()"/>
-      <xsl:with-param name="action" select="concat('Ext.getCmp(', $apos, 'editorPanel', $apos, 
-        ').showFileUploadPanel(', //geonet:info/id, ', ', $apos, gmx:FileName/geonet:element/@ref, $apos, ');')"/>
-    </xsl:call-template>
-  </xsl:template>
- 
- 	<!-- gmx:Anchor is a substitute of gco:CharacterString and 
-	     could be use to create a hyperlink for an element.
-	   -->
-	   <xsl:template mode="iso19139"
-	     match="*[gmx:Anchor]" priority="99">
-	     <xsl:param name="schema" />
-	     <xsl:param name="edit" />
-	     
-	     <xsl:apply-templates mode="complexElement" select=".">
-	       <xsl:with-param name="schema"   select="$schema"/>
-	       <xsl:with-param name="edit"     select="$edit"/>
-	       <xsl:with-param name="content">
-	         <xsl:choose>
-	           <xsl:when test="$edit=true()">
-	             <!-- existing content -->
-	             <xsl:apply-templates mode="simpleElement" select="gmx:Anchor/.">
-	               <xsl:with-param name="schema" select="$schema"/>
-	               <xsl:with-param name="edit"   select="$edit"/>
-	             </xsl:apply-templates>
-	           </xsl:when>
-	           <xsl:otherwise>
-	             <a href="{gmx:Anchor/@xlink:href}"><xsl:value-of select="gmx:Anchor"/></a>    
-	           </xsl:otherwise> 
-	         </xsl:choose>
-	       </xsl:with-param>  
-	     </xsl:apply-templates>
-	   </xsl:template>
-  
-  <!-- Add exception to update-fixed-info to avoid URL creation for downloadable resources -->
-  <xsl:template mode="iso19139" match="gmd:contactInstructions[gmx:FileName]" priority="2">
-    <xsl:param name="schema"/>
-    <xsl:param name="edit"/>
-    
-    <xsl:call-template name="file-or-logo-upload">
-      <xsl:with-param name="schema" select="$schema"/>
-      <xsl:with-param name="edit" select="$edit"/>
-      <xsl:with-param name="ref" select="gmx:FileName/geonet:element/@ref"/>
-      <xsl:with-param name="value" select="gmx:FileName"/>
-      <xsl:with-param name="src" select="gmx:FileName/@src"/>
-      <xsl:with-param name="action" select="concat('Ext.getCmp(', $apos ,'editorPanel', $apos, ').showLogoSelectionPanel(', $apos, '_', 
-        gmx:FileName/geonet:element/@ref, '_src', $apos, ');')"/>
-      <xsl:with-param name="delButton" select="false()"/>
-      <xsl:with-param name="setButton" select="true()"/>
-      <xsl:with-param name="visible" select="true()"/>
-      <xsl:with-param name="setButtonLabel" select="/root/gui/strings/chooseLogo"/>
-      <xsl:with-param name="label" select="/root/gui/strings/orgLogo"/>
-    </xsl:call-template>
-  </xsl:template>
-  
-  <xsl:template name="file-or-logo-upload">
+  <xsl:template name="file-or-logo-upload-geoviqua">
     <xsl:param name="schema"/>
     <xsl:param name="edit"/>
     <xsl:param name="ref"/>
@@ -819,72 +206,6 @@
     </xsl:apply-templates>
   </xsl:template>
 
-
-
-  <!-- ================================================================= -->
-  <!-- codelists -->
-  <!-- ================================================================= -->
-
-  <xsl:template mode="iso19139" match="gmd:*[*/@codeList]|srv:*[*/@codeList]">
-    <xsl:param name="schema"/>
-    <xsl:param name="edit"/>
-    
-    <xsl:call-template name="iso19139Codelist">
-      <xsl:with-param name="schema" select="$schema"/>
-      <xsl:with-param name="edit"   select="$edit"/>
-    </xsl:call-template>
-  </xsl:template>
-
-  
-  <!-- ============================================================================= -->
-
-  <xsl:template name="iso19139Codelist">
-    <xsl:param name="schema"/>
-    <xsl:param name="edit"/>
-    
-    <xsl:apply-templates mode="simpleElement" select=".">
-      <xsl:with-param name="schema" select="$schema"/>
-      <xsl:with-param name="edit"   select="$edit"/>
-      <xsl:with-param name="text">
-        <xsl:apply-templates mode="iso19139GetAttributeText" select="*/@codeListValue">
-          <xsl:with-param name="schema" select="$schema"/>
-          <xsl:with-param name="edit"   select="$edit"/>
-        </xsl:apply-templates>
-      </xsl:with-param>
-    </xsl:apply-templates>
-  </xsl:template>
-  
-  
-  <!-- LanguageCode is a codelist, but retrieving
-  the list of language as defined in the language database table
-  allows to create the list for selection.
-  
-  This table is also used for gmd:language element.
-  -->
-  <xsl:template mode="iso19139" match="gmd:LanguageCode" priority="2">
-    <xsl:param name="schema"/>
-    <xsl:param name="edit"/>
-    
-    <xsl:call-template name="iso19139GetIsoLanguage">
-      <xsl:with-param name="value" select="string(@codeListValue)"/>
-      <xsl:with-param name="ref" select="concat('_', geonet:element/@ref, '_codeListValue')"/>
-      <xsl:with-param name="schema" select="$schema"/>
-      <xsl:with-param name="edit"   select="$edit"/>
-    </xsl:call-template>
-  </xsl:template>
-
-  <!--  Do not allow editing of id to end user. Id is based on language selection
-  and iso code.-->
-  <xsl:template mode="iso19139" match="gmd:PT_Locale/@id"
-    priority="2">
-    <xsl:param name="schema" />
-    <xsl:param name="edit" />
-    
-    <xsl:apply-templates mode="simpleElement" select=".">
-      <xsl:with-param name="schema" select="$schema" />
-      <xsl:with-param name="edit" select="false()" />
-    </xsl:apply-templates>
-  </xsl:template>
   
   
   <!-- ============================================================================= -->
@@ -984,53 +305,6 @@
     -->
   </xsl:template>
   
-  <!-- ============================================================================= -->
-  <!--
-  make the following fields always not editable:
-  dateStamp
-  metadataStandardName
-  metadataStandardVersion
-  fileIdentifier
-  characterSet
-  -->
-  <!-- ============================================================================= -->
-
-  <xsl:template mode="iso19139" match="gmd:dateStamp|gmd:fileIdentifier" priority="2">
-    <xsl:param name="schema"/>
-    <xsl:param name="edit"/>
-    
-    <xsl:apply-templates mode="simpleElement" select=".">
-      <xsl:with-param name="schema"  select="$schema"/>
-      <xsl:with-param name="edit"    select="false()"/>
-      <xsl:with-param name="text">
-        <xsl:choose>
-          <xsl:when test="string-join(gco:*, '')=''">
-            <span class="info">
-              - <xsl:value-of select="/root/gui/strings/setOnSave"/> - 
-            </span>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="gco:*"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:with-param>
-    </xsl:apply-templates>
-  </xsl:template>
-
-  <!-- Attributes 
-   * deprecated: gmd:PT_Locale/@id is set by update-fixed-info using first 2 letters.
-   * gmd:PT_Locale/@id is set by update-fixed-info with 639-2 iso code
-  -->
-  <xsl:template mode="iso19139" match="gmd:PT_Locale/@id"
-    priority="2">
-    <xsl:param name="schema" />
-    <xsl:param name="edit" />
-    
-    <xsl:apply-templates mode="simpleElement" select=".">
-      <xsl:with-param name="schema" select="$schema" />
-      <xsl:with-param name="edit" select="false()" />
-    </xsl:apply-templates>
-  </xsl:template>
   
 
   <xsl:template mode="iso19139" match="//gvq:GVQ_Metadata/gmd:characterSet|//*[@gco:isoType='gmd:MD_Metadata']/gmd:characterSet" priority="2">
@@ -1043,32 +317,6 @@
     </xsl:call-template>
   </xsl:template>
   
-  <!-- ============================================================================= -->
-  <!-- electronicMailAddress -->
-  <!-- ============================================================================= -->
-
-  <xsl:template mode="iso19139" match="gmd:electronicMailAddress" priority="2">
-    <xsl:param name="schema"/>
-    <xsl:param name="edit"/>
-    
-    <xsl:choose>
-      <xsl:when test="$edit=true()">
-        <xsl:call-template name="iso19139String">
-          <xsl:with-param name="schema" select="$schema"/>
-          <xsl:with-param name="edit"   select="true()"/>
-          <xsl:with-param name="validator" select="'validateEmail(this);'"/>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:apply-templates mode="simpleElement" select=".">
-          <xsl:with-param name="schema"  select="$schema"/>
-          <xsl:with-param name="text">
-            <a href="mailto:{string(.)}"><xsl:value-of select="string(.)"/></a>
-          </xsl:with-param>
-        </xsl:apply-templates>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
   
   <!-- ============================================================================= -->
   <!-- descriptiveKeywords -->
@@ -1164,208 +412,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- ============================================================================= -->
-  <!-- place keyword; only called in edit mode (see descriptiveKeywords template) -->
-  <!-- ============================================================================= -->
-
-  <xsl:template mode="iso19139" match="gmd:keyword[following-sibling::gmd:type/gmd:MD_KeywordTypeCode/@codeListValue='place']">
-    <xsl:param name="schema"/>
-    <xsl:param name="edit"/>
-    
-    <xsl:variable name="text">
-      <xsl:variable name="ref" select="gco:CharacterString/geonet:element/@ref"/>
-      <xsl:variable name="keyword" select="gco:CharacterString/text()"/>
-      
-      <input class="md" type="text" name="_{$ref}" value="{gco:CharacterString/text()}" size="40" />
-
-      <!-- regions combobox -->
-
-      <xsl:variable name="lang" select="/root/gui/language"/>
-      <xsl:text> </xsl:text>
-      <select name="place" size="1" onChange="document.mainForm._{$ref}.value=this.options[this.selectedIndex].text" class="md">
-        <option value=""/>
-        <xsl:for-each select="/root/gui/regions/record">
-          <xsl:sort select="label/child::*[name() = $lang]" order="ascending"/>
-          <option value="{id}">
-            <xsl:if test="string(label/child::*[name() = $lang])=$keyword">
-              <xsl:attribute name="selected"/>
-            </xsl:if>
-            <xsl:value-of select="label/child::*[name() = $lang]"/>
-          </option>
-        </xsl:for-each>
-      </select>
-    </xsl:variable>
-    <xsl:apply-templates mode="simpleElement" select=".">
-      <xsl:with-param name="schema" select="$schema"/>
-      <xsl:with-param name="edit"   select="true()"/>
-      <xsl:with-param name="text"   select="$text"/>
-    </xsl:apply-templates>
-  </xsl:template>
-      
-
-  <!-- ============================================================================= -->
-  <!--
-  dateTime (format = %Y-%m-%dT%H:%M:00)
-  usageDateTime
-  plannedAvailableDateTime
-  -->
-  <!-- ============================================================================= -->
-
-  <xsl:template mode="iso19139" match="gmd:dateTime|gmd:usageDateTime|gmd:plannedAvailableDateTime" priority="2">
-    <xsl:param name="schema"/>
-    <xsl:param name="edit"/>
-    
-    <xsl:choose>
-      <xsl:when test="$edit=true()">
-        <xsl:apply-templates mode="simpleElement" select=".">
-          <xsl:with-param name="schema"  select="$schema"/>
-          <xsl:with-param name="edit"   select="$edit"/>
-          <xsl:with-param name="text">
-            <xsl:variable name="ref" select="gco:Date/geonet:element/@ref|gco:DateTime/geonet:element/@ref"/>
-            <xsl:variable name="format">
-              <xsl:choose>
-                <xsl:when test="gco:Date"><xsl:text>%Y-%m-%d</xsl:text></xsl:when>
-                <xsl:otherwise><xsl:text>%Y-%m-%dT%H:%M:00</xsl:text></xsl:otherwise>
-              </xsl:choose>
-            </xsl:variable>
-            
-            <xsl:call-template name="calendar">
-              <xsl:with-param name="ref" select="$ref"/>
-              <xsl:with-param name="date" select="gco:DateTime/text()|gco:Date/text()"/>
-              <xsl:with-param name="format" select="$format"/>
-            </xsl:call-template>
-            
-          </xsl:with-param>
-        </xsl:apply-templates>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:call-template name="iso19139String">
-          <xsl:with-param name="schema" select="$schema"/>
-          <xsl:with-param name="edit"   select="$edit"/>
-        </xsl:call-template>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
-  <!-- ============================================================================= -->
-  <!--
-  date (format = %Y-%m-%d)
-  editionDate
-  dateOfNextUpdate
-  mdDateSt is not editable (!we use DateTime instead of only Date!)
-  -->
-  <!-- ============================================================================= -->
-
-  <xsl:template mode="iso19139" match="gmd:date[gco:DateTime|gco:Date]|gmd:editionDate|gmd:dateOfNextUpdate" priority="2">
-    <xsl:param name="schema"/>
-    <xsl:param name="edit"/>
-    
-    <xsl:choose>
-      <xsl:when test="$edit=true()">
-        <xsl:apply-templates mode="simpleElement" select=".">
-          <xsl:with-param name="schema"  select="$schema"/>
-          <xsl:with-param name="edit"   select="$edit"/>
-          <xsl:with-param name="text">
-            <xsl:variable name="ref" select="gco:DateTime/geonet:element/@ref|gco:Date/geonet:element/@ref"/>
-            <xsl:variable name="format">
-              <xsl:choose>
-                <xsl:when test="gco:Date"><xsl:text>%Y-%m-%d</xsl:text></xsl:when>
-                <xsl:otherwise><xsl:text>%Y-%m-%dT%H:%M:00</xsl:text></xsl:otherwise>
-              </xsl:choose>
-            </xsl:variable>
-            
-            <xsl:call-template name="calendar">
-              <xsl:with-param name="ref" select="$ref"/>
-              <xsl:with-param name="date" select="gco:DateTime/text()|gco:Date/text()"/>
-              <xsl:with-param name="format" select="$format"/>
-            </xsl:call-template>
-            
-          </xsl:with-param>
-        </xsl:apply-templates>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:call-template name="iso19139String">
-          <xsl:with-param name="schema" select="$schema"/>
-          <xsl:with-param name="edit"   select="$edit"/>
-        </xsl:call-template>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
-  <!-- ===================================================================== -->
-  <!-- gml:TimePeriod (format = %Y-%m-%dThh:mm:ss) -->
-  <!-- ===================================================================== -->
-
-  <xsl:template mode="iso19139" match="gml:*[gml:beginPosition|gml:endPosition]|gml:TimeInstant[gml:timePosition]" priority="2">
-    <xsl:param name="schema"/>
-    <xsl:param name="edit"/>
-    <xsl:for-each select="*">
-    <xsl:choose>
-      <xsl:when test="$edit=true() and (name(.)='gml:beginPosition' or name(.)='gml:endPosition' or name(.)='gml:timePosition')">
-        <xsl:apply-templates mode="simpleElement" select=".">
-          <xsl:with-param name="schema"  select="$schema"/>
-          <xsl:with-param name="edit"   select="$edit"/>
-          <xsl:with-param name="text">
-            <xsl:variable name="ref" select="geonet:element/@ref"/>
-            <!-- 
-              TODO : Add the capability to edit those elements as:
-               * xs:time
-               * xs:dateTime
-               * xs:anyURI
-               * xs:decimal
-               * gml:CalDate
-              See http://trac.osgeo.org/geonetwork/ticket/661
-              
-            -->
-            <xsl:variable name="format">
-              <xsl:choose>
-                <!-- Add basic support of %Y-%m-%d format in edit mode -->
-                <xsl:when test="string-length(text()) = 10"><xsl:text>%Y-%m-%d</xsl:text></xsl:when>
-                <xsl:otherwise><xsl:text>%Y-%m-%dT%H:%M:00</xsl:text></xsl:otherwise>
-              </xsl:choose>
-            </xsl:variable>
-            
-            <xsl:call-template name="calendar">
-              <xsl:with-param name="ref" select="$ref"/>
-              <xsl:with-param name="date" select="text()"/>
-              <xsl:with-param name="format" select="$format"/>
-            </xsl:call-template>
-                        
-          </xsl:with-param>
-        </xsl:apply-templates>
-      </xsl:when>
-      <xsl:when test="name(.)='gml:timeInterval'">
-        <xsl:apply-templates mode="iso19139" select="."/>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:apply-templates mode="simpleElement" select=".">
-          <xsl:with-param name="schema"  select="$schema"/>
-          <xsl:with-param name="text">
-            <xsl:value-of select="text()"/>
-          </xsl:with-param>
-        </xsl:apply-templates>
-      </xsl:otherwise>
-    </xsl:choose>
-    </xsl:for-each>
-  </xsl:template>
   
-  <!-- =================================================================== -->
-  <!-- subtemplates -->
-  <!-- =================================================================== -->
-
-  <xsl:template mode="iso19139" match="*[geonet:info/isTemplate='s']" priority="3">
-    <xsl:param name="schema"/>
-    <xsl:param name="edit"/>
-    
-    <xsl:apply-templates mode="element" select=".">
-      <xsl:with-param name="schema" select="$schema"/>
-      <xsl:with-param name="edit"   select="$edit"/>
-    </xsl:apply-templates>
-  </xsl:template>
-  
-  <!-- ==================================================================== -->
-
-  <xsl:template mode="iso19139" match="@gco:isoType"/>
 
   <!-- ==================================================================== -->
   <!-- Metadata -->
@@ -1383,9 +430,10 @@
     
       <!-- metadata tab -->
       <xsl:when test="$currTab='metadata'">
-        <xsl:call-template name="iso19139Metadata">
+        <xsl:call-template name="iso19139.geoviquaMetadata">
           <xsl:with-param name="schema" select="$schema"/>
           <xsl:with-param name="edit"   select="$edit"/>
+          <xsl:with-param name="flat"   select="false"/>
         </xsl:call-template>
       </xsl:when>
 
@@ -1487,7 +535,7 @@
 
       <!-- ISOMinimum tab -->
       <xsl:when test="$currTab='ISOMinimum'">
-        <xsl:call-template name="isotabs">
+        <xsl:call-template name="isotabs.geoviqua">
           <xsl:with-param name="schema" select="$schema"/>
           <xsl:with-param name="edit"   select="$edit"/>
           <xsl:with-param name="dataset" select="$dataset"/>
@@ -1497,7 +545,7 @@
 
       <!-- ISOCore tab -->
       <xsl:when test="$currTab='ISOCore'">
-        <xsl:call-template name="isotabs">
+        <xsl:call-template name="isotabs.geoviqua">
           <xsl:with-param name="schema" select="$schema"/>
           <xsl:with-param name="edit"   select="$edit"/>
           <xsl:with-param name="dataset" select="$dataset"/>
@@ -1507,7 +555,7 @@
       
       <!-- ISOAll tab -->
       <xsl:when test="$currTab='ISOAll'">
-        <xsl:call-template name="iso19139Complete">
+        <xsl:call-template name="iso19139.geoviquaComplete">
           <xsl:with-param name="schema" select="$schema"/>
           <xsl:with-param name="edit"   select="$edit"/>
         </xsl:call-template>
@@ -1515,7 +563,7 @@
       
       <!-- INSPIRE tab -->
       <xsl:when test="$currTab='inspire'">
-        <xsl:call-template name="inspiretabs">
+        <xsl:call-template name="inspiretabs.geoviqua">
           <xsl:with-param name="schema" select="$schema"/>
           <xsl:with-param name="edit"   select="$edit"/>
           <xsl:with-param name="dataset" select="$dataset"/>          
@@ -1525,7 +573,7 @@
       
       <!-- default -->
       <xsl:otherwise>
-        <xsl:call-template name="iso19139Simple">
+        <xsl:call-template name="iso19139.geoviquaSimple">
           <xsl:with-param name="schema" select="$schema"/>
           <xsl:with-param name="edit"   select="$edit"/>
           <xsl:with-param name="flat"   select="/root/gui/config/metadata-tab/*[name(.)=$currTab]/@flat"/>
@@ -1536,7 +584,7 @@
 
   <!-- ============================================================================= -->
 
-  <xsl:template name="isotabs">
+  <xsl:template name="isotabs.geoviqua">
     <xsl:param name="schema"/>
     <xsl:param name="edit"/>
     <xsl:param name="dataset"/>
@@ -1764,7 +812,7 @@
   <!-- complete mode we just display everything - tab = complete          -->
   <!-- ================================================================== -->
 
-  <xsl:template name="iso19139Complete">
+  <xsl:template name="iso19139.geoviquaComplete">
     <xsl:param name="schema"/>
     <xsl:param name="edit"/>
 
@@ -1827,7 +875,7 @@
   
   <!-- ============================================================================= -->
 
-  <xsl:template name="iso19139Metadata">
+  <xsl:template name="iso19139.geoviquaMetadata">
     <xsl:param name="schema"/>
     <xsl:param name="edit"/>
     <xsl:param name="flat"/>
@@ -1928,7 +976,7 @@
   -->
   <!-- ============================================================================= -->
 
-  <xsl:template name="iso19139Simple">
+  <xsl:template name="iso19139.geoviquaSimple">
     <xsl:param name="schema"/>
     <xsl:param name="edit"/>
     <xsl:param name="flat"/>
@@ -2004,71 +1052,6 @@
     
   </xsl:template>
   
-  <!-- ============================================================================= -->
-
-  <xsl:template mode="iso19139" match="//gmd:language[gco:CharacterString]" priority="20">
-    <xsl:param name="schema"/>
-    <xsl:param name="edit"/>
-
-    <xsl:apply-templates mode="simpleElement" select=".">
-      <xsl:with-param name="schema" select="$schema"/>
-      <xsl:with-param name="edit"   select="$edit"/>
-      <xsl:with-param name="text">
-        <xsl:call-template name="iso19139GetIsoLanguage">
-          <xsl:with-param name="schema" select="$schema"/>
-          <xsl:with-param name="edit"   select="$edit"/>
-          <xsl:with-param name="value" select="gco:CharacterString"/>
-          <xsl:with-param name="ref" select="concat('_', gco:CharacterString/geonet:element/@ref)"/>
-        </xsl:call-template>
-      </xsl:with-param>
-    </xsl:apply-templates>
-  </xsl:template>
-  
-  <!-- ============================================================================= -->
-
-  <xsl:template name="iso19139GetIsoLanguage" mode="iso19139GetIsoLanguage" match="*">
-    <xsl:param name="schema"/>
-    <xsl:param name="edit"/>
-    <xsl:param name="value"/>
-      <xsl:param name="ref"/>
-    
-    <xsl:variable name="lang"  select="/root/gui/language"/>
-    
-    <xsl:choose>
-      <xsl:when test="$edit=true()">
-        <select class="md" name="{$ref}" size="1">
-          <option name=""/>
-
-          <xsl:for-each select="/root/gui/isoLang/record">
-            <xsl:sort select="label/child::*[name() = $lang]"/>
-            <option value="{code}">
-              <xsl:if test="code = $value">
-                <xsl:attribute name="selected"/>
-              </xsl:if>
-              <xsl:value-of select="label/child::*[name() = $lang]"/>
-            </option>
-          </xsl:for-each>
-        </select>
-      </xsl:when>
-
-      <xsl:otherwise>
-        <xsl:value-of select="/root/gui/isoLang/record[code=$value]/label/child::*[name() = $lang]"/>
-        
-        <!-- In view mode display other languages from gmd:locale of gvq:GVQ_Metadata element -->
-        <xsl:if test="../gmd:locale or ../../gmd:locale">
-          <xsl:text> (</xsl:text><xsl:value-of select="string(/root/gui/schemas/iso19139/labels/element[@name='gmd:locale' and not(@context)]/label)"/>
-          <xsl:text>:</xsl:text>
-          <xsl:for-each select="../gmd:locale|../../gmd:locale">
-            <xsl:variable name="c" select="gmd:PT_Locale/gmd:languageCode/gmd:LanguageCode/@codeListValue"/>
-            <xsl:value-of select="/root/gui/isoLang/record[code=$c]/label/child::*[name() = $lang]"/>
-            <xsl:if test="position()!=last()">, </xsl:if>
-          </xsl:for-each><xsl:text>)</xsl:text>
-        </xsl:if>
-       
-      </xsl:otherwise>
-    </xsl:choose>    
-  </xsl:template>
-
 
   <!-- ============================================================================= -->
   <!-- FIXME HTML should move to layout -->
@@ -2107,62 +1090,6 @@
     </xsl:apply-templates>
   </xsl:template>
   
-  <!-- ============================================================================= 
-  Custom element layout
-  -->
-
-  <xsl:template mode="iso19139" match="gmd:contact|gmd:pointOfContact|gmd:citedResponsibleParty">
-    <xsl:param name="schema"/>
-    <xsl:param name="edit"/>
-
-    <xsl:call-template name="contactTemplate">
-      <xsl:with-param name="edit" select="$edit"/>
-      <xsl:with-param name="schema" select="$schema"/>
-    </xsl:call-template>
-  </xsl:template>
-
-  <xsl:template name="contactTemplate">
-    <xsl:param name="schema"/>
-    <xsl:param name="edit"/>
-    
-    <xsl:variable name="content">
-      
-      <xsl:for-each select="gmd:CI_ResponsibleParty">
-        <col>
-                  <xsl:apply-templates mode="elementEP" select="../@xlink:href">
-                    <xsl:with-param name="schema" select="$schema"/>
-                    <xsl:with-param name="edit"   select="$edit"/>
-                  </xsl:apply-templates>
-                  
-                  <xsl:apply-templates mode="elementEP" select="gmd:individualName|geonet:child[string(@name)='individualName']
-                    |gmd:organisationName|geonet:child[string(@name)='organisationName']
-                    |gmd:positionName|geonet:child[string(@name)='positionName']
-                    |gmd:role|geonet:child[string(@name)='role']
-                    ">
-                    <xsl:with-param name="schema" select="$schema"/>
-                    <xsl:with-param name="edit"   select="$edit"/>
-                  </xsl:apply-templates>
-        </col>
-        <col>
-                  <xsl:apply-templates mode="elementEP" select="gmd:contactInfo|geonet:child[string(@name)='contactInfo']">
-                    <xsl:with-param name="schema" select="$schema"/>
-                    <xsl:with-param name="edit"   select="$edit"/>
-                  </xsl:apply-templates>
-        </col>        
-      </xsl:for-each>
-    </xsl:variable>
-    
-    <xsl:apply-templates mode="complexElement" select=".">
-      <xsl:with-param name="schema"  select="$schema"/>
-      <xsl:with-param name="edit"    select="$edit"/>
-      <xsl:with-param name="content">
-        <xsl:call-template name="columnElementGui">
-          <xsl:with-param name="cols" select="$content"/>
-        </xsl:call-template>
-      </xsl:with-param>
-    </xsl:apply-templates>
-    
-  </xsl:template>
 
   <!-- ============================================================================= -->
   <!-- online resources -->
@@ -2567,63 +1494,7 @@
 
   <!-- ============================================================================= -->
 
-  <xsl:template mode="iso19139FileRemove" match="*">
-    <xsl:param name="access" select="'public'"/>
-    <xsl:param name="id"/>
-    <xsl:param name="geo" select="true()"/>
-  
-    <xsl:call-template name="simpleElementGui">
-      <xsl:with-param name="title" select="/root/gui/strings/file"/>
-      <xsl:with-param name="text">
-        <table width="100%"><tr>
-          <xsl:variable name="ref" select="geonet:element/@ref"/>
-          <xsl:variable name="value" select="string(.)"/>
-          <td width="70%"><xsl:value-of select="$value"/></td>
-          <td align="right">
-            <input type="hidden" id="_{$ref}" value="{$value}"/>
-            <button type="button" onclick="javascript:doFileRemoveAction('{/root/gui/locService}/resources.del.new','{$ref}','{$access}','{$id}')"><xsl:value-of select="/root/gui/strings/remove"/></button>
-            <xsl:if test="$geo">
-              <xsl:call-template name="iso19139GeoPublisherButton">
-                <xsl:with-param name="access" select="$access"/>
-              </xsl:call-template>
-            </xsl:if>
-          </td>
-        </tr></table>
-      </xsl:with-param>
-      <xsl:with-param name="schema"/>
-    </xsl:call-template>
-  </xsl:template>
-
-
-  <!-- Add button for publication in GeoServer -->
-  <xsl:template mode="iso19139GeoPublisher" match="*">
-    <xsl:param name="access" select="'public'"/>
-    <xsl:param name="id"/>
-    <xsl:if test="/root/gui/config/editor-geopublisher">
-      <xsl:call-template name="simpleElementGui">
-        <xsl:with-param name="title" select="/root/gui/strings/file"/>
-        <xsl:with-param name="text">
-          <table width="100%"><tr>
-            <xsl:variable name="ref" select="geonet:element/@ref"/>
-            <xsl:variable name="value" select="string(.)"/>
-            
-            <td width="70%">
-              <input id="_{$ref}" class="md" type="text" name="_{$ref}" value="{.}" size="40" />
-            </td>
-            <td align="right">
-              <xsl:call-template name="iso19139GeoPublisherButton">
-                <xsl:with-param name="access" select="$access"/>
-              </xsl:call-template>
-            </td>
-          </tr></table>
-        </xsl:with-param>
-        <xsl:with-param name="schema"/>
-      </xsl:call-template>
-    </xsl:if>
-  </xsl:template>
-  
-  
-  <xsl:template name="iso19139GeoPublisherButton">
+  <xsl:template name="iso19139.geoviquaGeoPublisherButton">
     <xsl:param name="access" select="'public'"/>
     
     <xsl:if test="/root/gui/config/editor-geopublisher">
@@ -2646,13 +1517,20 @@
       </xsl:variable>
       
       <xsl:variable name="title">
-        <xsl:apply-templates mode="escapeXMLEntities" select="/root/gvq:GVQ_Metadata/gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString"/>
+        <xsl:apply-templates mode="escapeXMLEntities" select="/root/gvq:GVQ_Metadata/gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString">
+          <xsl:with-param name="includingCRLF" select="true()"/>
+        </xsl:apply-templates>
+      </xsl:variable>
+    
+      <xsl:variable name="abstract">
+        <xsl:apply-templates mode="escapeXMLEntities" select="/root/gmd:MD_Metadata/gmd:identificationInfo/*/gmd:abstract/gco:CharacterString"/>
       </xsl:variable>
     
       <button type="button" class="content repository" 
         onclick="javascript:Ext.getCmp('editorPanel').showGeoPublisherPanel('{/root/*/geonet:info/id}',
         '{/root/*/geonet:info/uuid}', 
         '{$title}',
+        '{$abstract}',
         '{$layer}', 
         '{$access}', 'gmd:onLine', '{ancestor::gmd:MD_DigitalTransferOptions/geonet:element/@ref}', [{$bbox}]);" 
         alt="{/root/gui/strings/publishHelp}" 
@@ -2692,337 +1570,7 @@
     </metadata>
   </xsl:template>
 
-  <xsl:template name="iso19139-brief">
-      <xsl:variable name="download_check"><xsl:text>&amp;fname=&amp;access</xsl:text></xsl:variable>
-      <xsl:variable name="info" select="geonet:info"/>
-      <xsl:variable name="id" select="$info/id"/>
-      <xsl:variable name="uuid" select="$info/uuid"/>
 
-      <xsl:if test="normalize-space(gmd:parentIdentifier/*)!=''">
-        <parentId><xsl:value-of select="gmd:parentIdentifier/*"/></parentId>
-      </xsl:if>
-
-      <xsl:variable name="langId">
-        <xsl:call-template name="getLangId">
-          <xsl:with-param name="langGui" select="/root/gui/language"/>
-          <xsl:with-param name="md" select="."/>
-        </xsl:call-template>
-      </xsl:variable>
-      
-      <xsl:apply-templates mode="briefster" select="gmd:identificationInfo/gvq:GVQ_DataIdentification|gmd:identificationInfo/*[@gco:isoType='gmd:MD_DataIdentification']|gmd:identificationInfo/srv:SV_ServiceIdentification">
-        <xsl:with-param name="id" select="$id"/>
-        <xsl:with-param name="langId" select="$langId"/>
-        <xsl:with-param name="info" select="$info"/>
-      </xsl:apply-templates>
-
-      <xsl:for-each select="gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/updated19115:CI_OnlineResource">
-        <xsl:variable name="protocol" select="gmd:protocol[1]/gco:CharacterString"/>
-        <xsl:variable name="protocolRequest" select="updated19115:protocolRequest[1]/gco:CharacterString"/>
-        <xsl:variable name="linkage"  select="normalize-space(gmd:linkage/gmd:URL)"/>
-        <xsl:variable name="name">
-          <xsl:for-each select="gmd:name">
-            <xsl:call-template name="localised">
-              <xsl:with-param name="langId" select="$langId"/>
-            </xsl:call-template>
-          </xsl:for-each>
-        </xsl:variable>
-
-        <xsl:variable name="mimeType" select="normalize-space(gmd:name/gmx:MimeFileType/@type)"/>
-        
-        <xsl:variable name="desc">
-          <xsl:for-each select="gmd:description">
-            <xsl:call-template name="localised">
-              <xsl:with-param name="langId" select="$langId"/>
-            </xsl:call-template>
-          </xsl:for-each>
-        </xsl:variable>
-        
-        <xsl:if test="string($linkage)!=''">
-            <xsl:element name="link">
-              <xsl:attribute name="title" select="$desc"/>
-              <xsl:attribute name="href" select="$linkage"/>
-              <xsl:attribute name="name" select="$name"/>
-              <xsl:attribute name="protocol" select="$protocol"/>
-              <xsl:attribute name="type" select="geonet:protocolMimeType($linkage, $protocol, $mimeType)"/>
-            </xsl:element>
-
-        </xsl:if>
-
-        <!-- Generate a KML output link for a WMS service -->
-        <xsl:if test="string($linkage)!='' and starts-with($protocol,'OGC:WMS-') and contains($protocol,'-get-map') and string($linkage)!='' and string($name)!=''">
-          
-          <xsl:element name="link">
-            <xsl:attribute name="title"><xsl:value-of select="$desc"/></xsl:attribute>
-            <xsl:attribute name="href">
-              <xsl:value-of select="concat('http://',/root/gui/env/server/host,':',/root/gui/env/server/port,/root/gui/locService,'/google.kml?uuid=',$uuid,'&amp;layers=',$name)"/>
-            </xsl:attribute>
-            <xsl:attribute name="name"><xsl:value-of select="$name"/></xsl:attribute>
-            <xsl:attribute name="type">application/vnd.google-earth.kml+xml</xsl:attribute>
-          </xsl:element>
-        </xsl:if>
-
-        <!-- The old links still in use by some systems. Deprecated -->
-        <xsl:choose>
-          <xsl:when test="matches($protocol,'^WWW:DOWNLOAD-.*-http--download.*') and not(contains($linkage,$download_check))">
-            <link type="download"><xsl:value-of select="$linkage"/></link>
-          </xsl:when>
-          <xsl:when test="starts-with($protocol,'OGC:WMS-') and contains($protocol,'-get-map') and string($linkage)!='' and string($name)!=''">
-            <link type="wms">
-              <xsl:value-of select="concat('javascript:addWMSLayer([[&#34;' , $name , '&#34;,&#34;' ,  $linkage  ,  '&#34;, &#34;', $name  ,'&#34;,&#34;',$id,'&#34;]])')"/>
-            </link>
-            <link type="googleearth">
-              <xsl:value-of select="concat(/root/gui/locService,'/google.kml?uuid=',$uuid,'&amp;layers=',$name)"/>
-            </link>
-          </xsl:when>
-          <xsl:when test="starts-with($protocol,'OGC:WMS-') and contains($protocol,'-get-capabilities') and string($linkage)!=''">
-            <link type="wms">
-              <!--xsl:value-of select="concat('javascript:runIM_selectService(&#34;'  ,  $linkage  ,  '&#34;, 2,',$id,')' )"/-->
-              <xsl:value-of select="concat('javascript:addWMSLayer([[&#34;' , $name , '&#34;,&#34;' ,  $linkage  ,  '&#34;, &#34;', $name  ,'&#34;,&#34;',$id,'&#34;]])')"/>            
-            </link>
-          </xsl:when>
-          <xsl:when test="string($linkage)!=''">
-            <link type="url"><xsl:value-of select="$linkage"/></link>
-          </xsl:when>
-          
-        </xsl:choose>
-      </xsl:for-each>
-
-      <xsl:for-each select="gmd:contact/*">
-        <xsl:variable name="role" select="gmd:role/*/@codeListValue"/>
-        <xsl:if test="normalize-space($role)!=''">
-          <responsibleParty role="{$role}" appliesTo="metadata">
-            <xsl:apply-templates mode="responsiblepartysimple" select="."/>
-          </responsibleParty>
-        </xsl:if>
-      </xsl:for-each>
-
-      <metadatacreationdate>
-        <xsl:value-of select="gmd:dateStamp/*"/>
-      </metadatacreationdate>
-      <geonet:info>
-        <xsl:copy-of select="geonet:info/*[name(.)!='edit']"/>
-        <xsl:choose>
-          <xsl:when test="/root/gui/env/harvester/enableEditing='false' and geonet:info/isHarvested='y' and geonet:info/edit='true'">
-            <edit>false</edit>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:copy-of select="geonet:info/edit"/>
-          </xsl:otherwise>
-        </xsl:choose>
-        
-         
-        <!-- 
-          Internal category could be define using different informations
-        in a metadata record (according to standard). This could be improved.
-        This type of categories could be added to Lucene index also in order
-        to be queriable. 
-        Services and datasets are at least the required internal categories
-        to be distinguished for INSPIRE requirements (hierarchyLevel could be
-        use also). TODO
-        -->
-        <category internal="true">
-          <xsl:choose>
-            <xsl:when test="gmd:identificationInfo/srv:SV_ServiceIdentification">service</xsl:when>
-            <xsl:otherwise>dataset</xsl:otherwise>
-          </xsl:choose>
-        </category>
-      </geonet:info>
-  </xsl:template>
-
-  <xsl:template mode="briefster" match="*">
-    <xsl:param name="id"/>
-    <xsl:param name="langId"/>
-    <xsl:param name="info"/>
-    
-      <xsl:if test="gmd:citation/gmd:CI_Citation/gmd:title">
-        <title>
-          <xsl:apply-templates mode="localised" select="gmd:citation/gmd:CI_Citation/gmd:title">
-            <xsl:with-param name="langId" select="$langId"></xsl:with-param>
-          </xsl:apply-templates>
-        </title>
-      </xsl:if>
-
-      <xsl:if test="gmd:citation/*/gmd:date/*/gmd:dateType/*[@codeListValue='creation']">
-        <datasetcreationdate>
-          <xsl:value-of select="gmd:citation/*/gmd:date/*/gmd:date/gco:DateTime"/>
-        </datasetcreationdate>
-      </xsl:if>
-      
-      <xsl:if test="gmd:abstract">
-        <abstract>
-          <xsl:apply-templates mode="localised" select="gmd:abstract">
-            <xsl:with-param name="langId" select="$langId"></xsl:with-param>
-          </xsl:apply-templates>
-        </abstract>
-      </xsl:if>
-
-      <xsl:for-each select=".//gmd:keyword[not(@gco:nilReason)]">
-        <keyword>
-          <xsl:apply-templates mode="localised" select=".">
-            <xsl:with-param name="langId" select="$langId"></xsl:with-param>
-          </xsl:apply-templates>
-        </keyword>
-      </xsl:for-each>
-    
-      <xsl:for-each select="gmd:extent/*/gmd:geographicElement/gmd:EX_GeographicBoundingBox">
-        <geoBox>
-          <westBL><xsl:value-of select="gmd:westBoundLongitude"/></westBL>
-          <eastBL><xsl:value-of select="gmd:eastBoundLongitude"/></eastBL>
-          <southBL><xsl:value-of select="gmd:southBoundLatitude"/></southBL>
-          <northBL><xsl:value-of select="gmd:northBoundLatitude"/></northBL>
-        </geoBox>
-      </xsl:for-each>
-
-      <xsl:for-each select="*/gmd:MD_Constraints/*">
-        <Constraints preformatted="true">
-          <xsl:apply-templates mode="iso19139" select=".">
-            <xsl:with-param name="schema" select="$info/schema"/>
-            <xsl:with-param name="edit" select="false()"/>
-          </xsl:apply-templates>
-        </Constraints>
-        <Constraints preformatted="false">
-          <xsl:copy-of select="."/>
-        </Constraints>
-      </xsl:for-each>
-
-      <xsl:for-each select="*/gmd:MD_SecurityConstraints/*">
-        <SecurityConstraints preformatted="true">
-          <xsl:apply-templates mode="iso19139" select=".">
-            <xsl:with-param name="schema" select="$info/schema"/>
-            <xsl:with-param name="edit" select="false()"/>
-          </xsl:apply-templates>
-        </SecurityConstraints>
-        <SecurityConstraints preformatted="false">
-          <xsl:copy-of select="."/>
-        </SecurityConstraints>
-      </xsl:for-each>
-
-      <xsl:for-each select="*/gmd:MD_LegalConstraints/*">
-        <LegalConstraints preformatted="true">
-          <xsl:apply-templates mode="iso19139" select=".">
-            <xsl:with-param name="schema" select="$info/schema"/>
-            <xsl:with-param name="edit" select="false()"/>
-          </xsl:apply-templates>
-        </LegalConstraints>
-        <LegalConstraints preformatted="false">
-          <xsl:copy-of select="."/>
-        </LegalConstraints>
-      </xsl:for-each>
-
-      <xsl:for-each select="gmd:extent/*/gmd:temporalElement/*/gmd:extent/gml:TimePeriod">
-        <temporalExtent>
-          <begin><xsl:apply-templates mode="brieftime" select="gml:beginPosition|gml:begin/gml:TimeInstant/gml:timePosition"/></begin>
-          <end><xsl:apply-templates mode="brieftime" select="gml:endPosition|gml:end/gml:TimeInstant/gml:timePosition"/></end>
-        </temporalExtent>
-      </xsl:for-each>
-
-      <xsl:if test="not($info/server)">
-        <xsl:for-each select="gmd:graphicOverview/gmd:MD_BrowseGraphic">
-          <xsl:variable name="fileName"  select="gmd:fileName/gco:CharacterString"/>
-          <xsl:if test="$fileName != ''">
-            <xsl:variable name="fileDescr" select="gmd:fileDescription/gco:CharacterString"/>
-            <xsl:choose>
-
-              <!-- the thumbnail is an url -->
-
-              <xsl:when test="contains($fileName ,'://')">
-                <image type="unknown"><xsl:value-of select="$fileName"/></image>                
-              </xsl:when>
-
-              <!-- small thumbnail -->
-
-              <xsl:when test="string($fileDescr)='thumbnail'">
-                <xsl:choose>
-                  <xsl:when test="$info/isHarvested = 'y'">
-                    <xsl:choose>
-                      <xsl:when test="$info/harvestInfo/smallThumbnail">
-                        <image type="thumbnail">
-                          <xsl:value-of select="concat($info/harvestInfo/smallThumbnail, $fileName)"/>
-                        </image>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <!-- When harvested, thumbnail is stored in local node (eg. ogcwxs). 
-                        Only GeoNetHarvester set smallThumbnail elements.
-                        -->
-                        <image type="thumbnail">
-                          <xsl:value-of select="concat(/root/gui/locService,'/resources.get?id=',$id,'&amp;fname=',$fileName,'&amp;access=public')"/>
-                        </image>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:when>
-                  
-                  <xsl:otherwise>
-                    <image type="thumbnail">
-                      <xsl:value-of select="concat(/root/gui/locService,'/resources.get?id=',$id,'&amp;fname=',$fileName,'&amp;access=public')"/>
-                    </image>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </xsl:when>
-
-              <!-- large thumbnail -->
-
-              <xsl:when test="string($fileDescr)='large_thumbnail'">
-                <xsl:choose>
-                  <xsl:when test="$info/isHarvested = 'y'">
-                    <xsl:if test="$info/harvestInfo/largeThumbnail">
-                      <image type="overview">
-                        <xsl:value-of select="concat($info/harvestInfo/largeThumbnail, $fileName)"/>
-                      </image>
-                    </xsl:if>
-                  </xsl:when>
-                  
-                  <xsl:otherwise>
-                    <image type="overview">
-                      <xsl:value-of select="concat(/root/gui/locService,'/resources.get?id=',$id,'&amp;fname=',$fileName,'&amp;access=public')"/>
-                    </image>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </xsl:when>
-
-            </xsl:choose>
-          </xsl:if>
-        </xsl:for-each>
-      </xsl:if>
-
-      <xsl:for-each select="gmd:pointOfContact/*">
-        <xsl:variable name="role" select="gmd:role/*/@codeListValue"/>
-        <xsl:if test="normalize-space($role)!=''">
-          <responsibleParty role="{$role}" appliesTo="resource">
-            <xsl:if test="descendant::*/gmx:FileName">
-              <xsl:attribute name="logo"><xsl:value-of select="descendant::*/gmx:FileName/@src"/></xsl:attribute>
-            </xsl:if>
-            <xsl:apply-templates mode="responsiblepartysimple" select="."/>
-          </responsibleParty>
-        </xsl:if>
-      </xsl:for-each>
-
-  </xsl:template>
-
-  <!-- helper to create a very simplified view of a CI_ResponsibleParty block -->
-
-  <xsl:template mode="responsiblepartysimple" match="*">
-    <xsl:for-each select=".//gco:CharacterString|.//gmd:URL">
-      <xsl:if test="normalize-space(.)!=''">
-        <xsl:element name="{local-name(..)}">
-          <xsl:value-of select="."/>
-        </xsl:element>
-      </xsl:if>
-    </xsl:for-each>
-  </xsl:template>
-
-  <xsl:template mode="brieftime" match="*">
-    <xsl:choose>
-      <xsl:when test="normalize-space(.)=''">
-        <xsl:value-of select="@indeterminatePosition"/>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="."/>
-        <xsl:if test="@indeterminatePosition">
-          <xsl:value-of select="concat(' (Qualified by indeterminatePosition',': ',@indeterminatePosition,')')"/>
-        </xsl:if>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
   
   <!-- In order to add profil specific tabs 
     add a template in this mode.
@@ -3043,7 +1591,7 @@
   <!-- iso19139 complete tab template  -->
   <!-- ============================================================================= -->
 
-  <xsl:template name="iso19139CompleteTab">
+  <xsl:template name="iso19139.geoviquaCompleteTab">
     <xsl:param name="tabLink"/>
     <xsl:param name="schema"/>
     
@@ -3100,116 +1648,6 @@
     </xsl:if>    
   </xsl:template>
   
-  <!-- ============================================================================= -->
-  <!-- utilities -->
-  <!-- ============================================================================= -->
-  
-  <!-- List of regions to define country.
-  gmd:country is not a codelist (only country in PT_Local is).
-  A list of existing countries in Regions table is suggested to the editor.
-  The input text could also be used to type another value.
-  -->
-  <xsl:template mode="iso19139" match="gmd:country[gco:CharacterString]" priority="1">
-    <xsl:param name="schema" />
-    <xsl:param name="edit" />
-    
-    <xsl:variable name="qname" select="name(.)"/>
-    <xsl:variable name="value" select="gco:CharacterString"/>
-    <xsl:variable name="isXLinked" select="count(ancestor-or-self::node()[@xlink:href]) > 0" />    
-    
-    <xsl:apply-templates mode="simpleElement" select=".">
-      <xsl:with-param name="schema" select="$schema" />
-      <xsl:with-param name="edit" select="$edit" />
-      <xsl:with-param name="text">
-        <xsl:choose>                    
-          <xsl:when test="$edit=true()">
-            
-            <xsl:variable name="lang" select="/root/gui/language"/>
-            <input class="md" name="_{gco:CharacterString/geonet:element/@ref}"
-            id="_{gco:CharacterString/geonet:element/@ref}" value="{gco:CharacterString}">
-              <xsl:if test="$isXLinked">
-                <xsl:attribute name="disabled">disabled</xsl:attribute>
-              </xsl:if>          
-            </input>
-            <xsl:if test="not($isXLinked)">
-              <xsl:text> </xsl:text>
-              <select class="md"
-                onchange="Ext.getDom('_{gco:CharacterString/geonet:element/@ref}').value = this.options[this.selectedIndex].value;"
-                size="1">
-                <option name="" />
-                <xsl:for-each select="/root/gui/regions/record">
-                  <xsl:sort select="label/child::*[name() = $lang]" order="ascending"/>
-                  
-                  <option value="{label/child::*[name() = $lang]}">
-                    <xsl:if test="$value = label/child::*[name() = $lang]">
-                      <xsl:attribute name="selected"/>
-                    </xsl:if>
-                    <xsl:value-of select="label/child::*[name() = $lang]"/>
-                  </option>
-                </xsl:for-each>
-              </select>
-            </xsl:if>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of
-              select="$value" />
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:with-param>
-    </xsl:apply-templates>
-  </xsl:template>
-
-
-
-   <!--
-        Open a popup to select a parent and set the parent identifier field or
-				select a related metadata record as a sibling.
-        In view mode display an hyperlink to the parent or sibling metadata record.
-    -->
-    <xsl:template mode="iso19139" match="gmd:parentIdentifier|gmd:code[name(../..)='gmd:aggregateDataSetIdentifier']"
-        priority="2">
-        <xsl:param name="schema" />
-        <xsl:param name="edit" />
-
-        <xsl:choose>
-            <xsl:when test="$edit=true()">
-                <xsl:variable name="text">
-                    <xsl:variable name="ref"
-                        select="gco:CharacterString/geonet:element/@ref" />
-                    <input onfocus="javascript:Ext.getCmp('editorPanel').showLinkedMetadataSelectionPanel('{$ref}', '');"
-                        class="md" type="text" name="_{$ref}" id="_{$ref}" value="{gco:CharacterString/text()}" size="20" />
-                    <img src="../../images/find.png" alt="{/root/gui/strings/parentSearch}" title="{/root/gui/strings/parentSearch}"
-                      onclick="javascript:Ext.getCmp('editorPanel').showLinkedMetadataSelectionPanel('{$ref}', '');"/>
-                </xsl:variable>
-
-                <xsl:apply-templates mode="simpleElement"
-                    select=".">
-                    <xsl:with-param name="schema" select="$schema" />
-                    <xsl:with-param name="edit" select="true()" />
-                    <xsl:with-param name="text" select="$text" />
-                </xsl:apply-templates>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:apply-templates mode="simpleElement"
-                    select=".">
-                    <xsl:with-param name="schema" select="$schema" />
-                    <xsl:with-param name="text">
-                    
-                        <xsl:variable name="metadataTitle">
-                            <xsl:call-template name="getMetadataTitle">
-                                <xsl:with-param name="uuid" select="gco:CharacterString"></xsl:with-param>
-                            </xsl:call-template>
-                        </xsl:variable>
-                        <a href="#" onclick="javascript:catalogue.metadataShow('{gco:CharacterString}');return false;">
-                            <xsl:value-of select="$metadataTitle"/>
-                        </a>
-                    </xsl:with-param>
-                </xsl:apply-templates>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-
-
 
   <!-- Display extra thumbnails (not managed by GeoNetwork).
     Thumbnails managed by GeoNetwork are displayed on header.
@@ -3300,197 +1738,6 @@
     </thumbnail>
   </xsl:template>
 
-
-  <!--
-    =====================================================================
-    Multilingual metadata:
-    =====================================================================
-    * ISO 19139 define how to store multilingual content in a metadata
-    record. 
-    1) A record is defined by a main language set in 
-    gmd:MD_Metadata/gmd:language element. All gco:CharacterString are
-    then defined in that language. 
-    2) In order to add translation editor
-    should add a gmd:locale element in gmd:MD_Metadata:  
-    <gmd:locale>
-      <gmd:PT_Locale id="FR">
-        <gmd:languageCode>
-          <gmd:LanguageCode codeList="#FR" codeListValue="fra"/>
-        </gmd:languageCode>
-        <gmd:characterEncoding/>
-      </gmd:PT_Locale>
-    </gmd:locale>
-    3) Once declared in gmd:locale, all gco:CharacterString could
-    be translated using the following mechanism:
-      * add xsi:type attribute (@see DataManager.updatedLocalizedTextElement)
-      * add gmd:PT_FreeText element linked to locale using the locale
-      attribute.
-    <gmd:title xsi:type="gmd:PT_FreeText_PropertyType">
-        <gco:CharacterString>Template for Vector data in ISO19139
-        (preferred!)</gco:CharacterString>
-      <gmd:PT_FreeText>
-        <gmd:textGroup>
-          <gmd:LocalisedCharacterString locale="#FR">Modèle de saisie pour les données vecteurs en ISO19139</gmd:LocalisedCharacterString>
-        </gmd:textGroup>
-      </gmd:PT_FreeText>
-    </gmd:title>
-    
-    =====================================================================    
-    Editor principles:
-    =====================================================================    
-    * available locales in metadata records are not displayed in view
-    mode, only used in editing mode in order to add multilingual content.
-  -->  
-  <xsl:template mode="iso19139" match="gmd:locale|geonet:child[string(@name)='locale']" priority="1">
-    <xsl:param name="schema" />
-    <xsl:param name="edit" />
-    <xsl:choose>
-      <xsl:when test="$edit = true()">
-        <xsl:variable name="content">
-          <xsl:apply-templates mode="elementEP" select="*/gmd:languageCode|*/geonet:child[string(@name)='languageCode']">
-            <xsl:with-param name="schema" select="$schema"/>
-            <xsl:with-param name="edit"   select="$edit"/>
-          </xsl:apply-templates>
-        </xsl:variable>          
-        
-        <xsl:apply-templates mode="complexElement" select=".">
-          <xsl:with-param name="schema"  select="$schema"/>
-          <xsl:with-param name="edit"    select="$edit"/>
-          <xsl:with-param name="content" select="$content"/>
-        </xsl:apply-templates>
-      </xsl:when>
-      <!-- In view mode, gmd:locale is displayed next to gmd:language -->
-    </xsl:choose>
-    
-  </xsl:template>
-
-
-
-  <!--
-    =====================================================================        
-    * All elements having gco:CharacterString or gmd:PT_FreeText elements
-    have to display multilingual editor widget. Even if default language
-    is set, an element could have gmd:PT_FreeText and no gco:CharacterString
-    (ie. no value for default metadata language) .
-  -->
-  <xsl:template mode="iso19139"
-    match="gmd:*[gco:CharacterString or gmd:PT_FreeText]|
-    srv:*[gco:CharacterString or gmd:PT_FreeText]|
-    gco:aName[gco:CharacterString]"
-    >
-    <xsl:param name="schema" />
-    <xsl:param name="edit" />
-    
-    <!-- Define a class variable if form element as
-      to be a textarea instead of a simple text input.
-      This parameter define the class of the textarea (see CSS). -->
-    <xsl:variable name="class">
-      <xsl:choose>
-        <xsl:when test="name(.)='gmd:title' and name(../../../..)='gmd:identificationInfo'">title</xsl:when>
-        <xsl:when test="name(.)='gmd:abstract'">large</xsl:when>
-        <xsl:when test="name(.)='gmd:supplementalInformation'
-          or name(.)='gmd:purpose'
-          or name(.)='gmd:statement'">medium</xsl:when>
-        <xsl:when test="name(.)='gmd:description'
-          or name(.)='gmd:specificUsage'
-          or name(.)='gmd:explanation'
-          or name(.)='gmd:credit'
-          or name(.)='gmd:evaluationMethodDescription'
-          or name(.)='gmd:measureDescription'
-          or name(.)='gmd:maintenanceNote'
-          or name(.)='gmd:useLimitation'
-          or name(.)='gmd:otherConstraints'
-          or name(.)='gmd:handlingDescription'
-          or name(.)='gmd:userNote'
-          or name(.)='gmd:checkPointDescription'
-          or name(.)='gmd:evaluationMethodDescription'
-          or name(.)='gmd:measureDescription'
-          ">small</xsl:when>
-        <xsl:otherwise></xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-    
-    <xsl:call-template name="localizedCharStringField">
-      <xsl:with-param name="schema" select="$schema" />
-      <xsl:with-param name="edit" select="$edit" />
-      <xsl:with-param name="class" select="$class" />
-    </xsl:call-template>
-  </xsl:template>
-  
-  <!-- =====================================================================        
-    * Anyway some elements should not be multilingual.
-    
-    Use this template to define which elements
-    are not multilingual.
-    If an element is not multilingual and require
-    a specific widget (eg. protocol list), create
-    a new template for this new element.
-    
-    !!! WARNING: this is not defined in ISO19139. !!!
-    This list of element mainly focus on identifier (eg. postal code)
-    which are usually not multilingual. The list has been defined
-    based on ISO profil for Switzerland recommendations. Feel free
-    to adapt this list according to your needs.
-  -->
-  <xsl:template mode="iso19139"
-    match="
-    gmd:identifier[gco:CharacterString]|
-    gmd:metadataStandardName[gco:CharacterString]|
-    gmd:metadataStandardVersion[gco:CharacterString]|
-    gmd:hierarchyLevelName[gco:CharacterString]|
-    gmd:dataSetURI[gco:CharacterString]|
-    gmd:postalCode[gco:CharacterString]|
-    gmd:city[gco:CharacterString]|
-    gmd:administrativeArea[gco:CharacterString]|
-    gmd:voice[gco:CharacterString]|
-    gmd:facsimile[gco:CharacterString]|
-    gmd:MD_ScopeDescription/gmd:dataset[gco:CharacterString]|
-    gmd:MD_ScopeDescription/gmd:other[gco:CharacterString]|
-    gmd:hoursOfService[gco:CharacterString]|
-    gmd:applicationProfile[gco:CharacterString]|
-    gmd:CI_Series/gmd:page[gco:CharacterString]|
-    gmd:MD_BrowseGraphic/gmd:fileName[gco:CharacterString]|
-    gmd:MD_BrowseGraphic/gmd:fileType[gco:CharacterString]|
-    gmd:unitsOfDistribution[gco:CharacterString]|
-    gmd:amendmentNumber[gco:CharacterString]|
-    gmd:specification[gco:CharacterString]|
-    gmd:fileDecompressionTechnique[gco:CharacterString]|
-    gmd:turnaround[gco:CharacterString]|
-    gmd:fees[gco:CharacterString]|
-    gmd:userDeterminedLimitations[gco:CharacterString]|
-    gmd:RS_Identifier/gmd:codeSpace[gco:CharacterString]|
-    gmd:RS_Identifier/gmd:version[gco:CharacterString]|
-    gmd:edition[gco:CharacterString]|
-    gmd:ISBN[gco:CharacterString]|
-    gmd:ISSN[gco:CharacterString]|
-    gmd:errorStatistic[gco:CharacterString]|
-    gmd:schemaAscii[gco:CharacterString]|
-    gmd:softwareDevelopmentFileFormat[gco:CharacterString]|
-    gmd:MD_ExtendedElementInformation/gmd:shortName[gco:CharacterString]|
-    gmd:MD_ExtendedElementInformation/gmd:condition[gco:CharacterString]|
-    gmd:MD_ExtendedElementInformation/gmd:maximumOccurence[gco:CharacterString]|
-    gmd:MD_ExtendedElementInformation/gmd:domainValue[gco:CharacterString]|
-    gmd:densityUnits[gco:CharacterString]|
-    gmd:MD_RangeDimension/gmd:descriptor[gco:CharacterString]|
-    gmd:classificationSystem[gco:CharacterString]|
-    gmd:checkPointDescription[gco:CharacterString]|
-    gmd:transformationDimensionDescription[gco:CharacterString]|
-    gmd:orientationParameterDescription[gco:CharacterString]|
-    srv:SV_OperationChainMetadata/srv:name[gco:CharacterString]|
-    srv:SV_OperationMetadata/srv:invocationName[gco:CharacterString]|
-    srv:serviceTypeVersion[gco:CharacterString]|
-    srv:operationName[gco:CharacterString]|
-    srv:identifier[gco:CharacterString]
-    "
-    priority="100">
-    <xsl:param name="schema" />
-    <xsl:param name="edit" />
-    
-    <xsl:call-template name="iso19139String">
-      <xsl:with-param name="schema" select="$schema"/>
-      <xsl:with-param name="edit"   select="$edit"/>
-    </xsl:call-template>
-  </xsl:template>
 
   <!-- match everything else and do nothing - leave that to iso19139 mode -->
   <xsl:template mode="iso19139.geoviqua" match="*|@*"/> 
