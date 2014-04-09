@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="2.0" xmlns:xsl ="http://www.w3.org/1999/XSL/Transform"
+
+<xsl:stylesheet version="2.0" 
+xmlns:xsl ="http://www.w3.org/1999/XSL/Transform"
+  xmlns:gmd19157="http://www.geoviqua.org/gmd19157"
+  xmlns:updated19115="http://schemas.geoviqua.org/ISO/19139/20120707_GVQ/19115_updates.xsd"
   xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/4.0"
   xmlns:gmd="http://www.isotc211.org/2005/gmd"
   xmlns:gts="http://www.isotc211.org/2005/gts"
