@@ -17,9 +17,9 @@
     xmlns:saxon="http://saxon.sf.net/"
     exclude-result-prefixes="gmx xsi gmd gco gml gts srv xlink exslt geonet gvq updated19115 gmd19157 un">
 
-	<xsl:include href="metadata-iso19139.geoviqua-fop.xsl"/>
-	<xsl:include href="metadata-iso19139.geoviqua-subtemplates.xsl"/>
-	<xsl:include href="metadata-iso19139.geoviqua-utils.xsl"/>
+	<xsl:include href="metadata-fop.xsl"/>
+	<xsl:include href="metadata-subtemplates.xsl"/>
+	<xsl:include href="metadata-utils.xsl"/>
 
 	<xsl:output name="serialize" method="xml" omit-xml-declaration="no" indent="yes" saxon:indent-spaces="1"/>
 
@@ -1508,7 +1508,7 @@
 
 			<!-- ISOAll tab -->
 			<xsl:when test="$currTab='ISOAll'">
-				<xsl:call-template name="iso19139Complete">
+				<xsl:call-template name="iso19139.geoviquaComplete">
 					<xsl:with-param name="schema" select="$schema"/>
 					<xsl:with-param name="edit"   select="$edit"/>
 				</xsl:call-template>
@@ -1516,7 +1516,7 @@
 
 			<!-- INSPIRE tab -->
 			<xsl:when test="$currTab='inspire'">
-				<xsl:call-template name="inspiretabs">
+				<xsl:call-template name="inspiretabs.geoviqua">
 					<xsl:with-param name="schema" select="$schema"/>
 					<xsl:with-param name="edit"   select="$edit"/>
 					<xsl:with-param name="dataset" select="$dataset"/>
@@ -1526,7 +1526,7 @@
 
 			<!-- default -->
 			<xsl:otherwise>
-				<xsl:call-template name="iso19139Simple">
+				<xsl:call-template name="iso19139.geoviquaSimple">
 					<xsl:with-param name="schema" select="$schema"/>
 					<xsl:with-param name="edit"   select="$edit"/>
 				</xsl:call-template>
@@ -3085,7 +3085,7 @@
 					<td align="right">
 						<input type="hidden" id="_{$ref}" value="{$value}"/>
 						<button class="content" onclick="javascript:doFileRemoveAction('{/root/gui/locService}/resources.del','{$ref}','{$access}','{$id}')"><xsl:value-of select="/root/gui/strings/remove"/></button>
-						<xsl:call-template name="iso19139GeoPublisherButton">
+						<xsl:call-template name="iso19139.geoviquaGeoPublisherButton">
 							<xsl:with-param name="access" select="$access"></xsl:with-param>
 						</xsl:call-template>
 					</td>
@@ -3113,7 +3113,7 @@
 							<input id="_{$ref}" class="md" type="text" name="_{$ref}" value="{.}" size="40" />
 						</td>
 						<td align="right">
-							<xsl:call-template name="iso19139GeoPublisherButton">
+							<xsl:call-template name="iso19139.geoviquaGeoPublisherButton">
 								<xsl:with-param name="access" select="$access"></xsl:with-param>
 							</xsl:call-template>
 						</td>
@@ -3123,32 +3123,6 @@
 			</xsl:call-template>
 		</xsl:if>
 	</xsl:template>
-
-<!-- 	<xsl:template name="iso19139GeoPublisherButton">
-		<xsl:param name="access" select="'public'"/>
-
-		<xsl:if test="/root/gui/config/editor-geopublisher">
-			<xsl:variable name="bbox">
-				<xsl:call-template name="iso19139-global-bbox"/>
-			</xsl:variable>
-			<xsl:variable name="layer">
-				<xsl:choose>
-					<xsl:when test="../../gmd:protocol/gco:CharacterString='DB:POSTGIS'">
-						<xsl:value-of select="concat(../../gmd:linkage/gmd:URL, '#', .)"/>
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:value-of select="."/>
-					</xsl:otherwise>
-				</xsl:choose>
-			</xsl:variable>
-
-			<button type="button" class="content repository"
-				 onclick="javascript:showGeoPublisherPanel('{/root/*/geonet:info/id}', '{$layer}', 
-				 '{$access}', 'gmd:onLine', '{ancestor::gmd:MD_DigitalTransferOptions/geonet:element/@ref}', [{$bbox}]);" 
-				 alt="{/root/gui/strings/publishHelp}" 
-				 title="{/root/gui/strings/geopublisherHelp}"><xsl:value-of select="/root/gui/strings/geopublisher"/></button>
-		</xsl:if>
-	</xsl:template> -->
 
 	<!-- ===================================================================== -->
 	<!-- === iso19139 brief formatting === -->

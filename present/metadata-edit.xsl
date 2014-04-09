@@ -563,7 +563,7 @@
       
       <!-- INSPIRE tab -->
       <xsl:when test="$currTab='inspire'">
-        <xsl:call-template name="inspiretabs.geoviqua">
+        <xsl:call-template name="inspiretabs">
           <xsl:with-param name="schema" select="$schema"/>
           <xsl:with-param name="edit"   select="$edit"/>
           <xsl:with-param name="dataset" select="$dataset"/>          
