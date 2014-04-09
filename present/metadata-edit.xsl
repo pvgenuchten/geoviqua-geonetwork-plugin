@@ -1702,21 +1702,23 @@ xmlns:xsl ="http://www.w3.org/1999/XSL/Transform"
                 </xsl:choose>
             </xsl:variable>
               
-            <xsl:variable name="fileName" select="gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString"/>
-            <xsl:variable name="url" select="if (contains($fileName, '://')) 
-                                                then $fileName 
-                                                else geonet:get-thumbnail-url($fileName, //geonet:info, /root/gui/locService)"/>
-
-            <div class="md-view">
-              <a rel="lightbox-viewset" href="{$url}">
-                <img class="logo" src="{$url}">
-                  <xsl:attribute name="alt"><xsl:value-of select="$imageTitle"/></xsl:attribute>
-                    <xsl:attribute name="title"><xsl:value-of select="$imageTitle"/></xsl:attribute>
-                </img>
-              </a>  
-              <br/>
-              <span class="thumbnail"><a href="{$url}" target="thumbnail-view"><xsl:value-of select="$imageTitle"/></a></span>
-            </div>
+            <xsl:if test="gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString">
+	            <xsl:variable name="fileName" select="gmd:MD_BrowseGraphic/gmd:fileName/gco:CharacterString"/>
+	            <xsl:variable name="url" select="if (contains($fileName, '://')) 
+	                                                then $fileName 
+	                                                else geonet:get-thumbnail-url($fileName, //geonet:info, /root/gui/locService)"/>
+	
+	            <div class="md-view">
+	              <a rel="lightbox-viewset" href="{$url}">
+	                <img class="logo" src="{$url}">
+	                  <xsl:attribute name="alt"><xsl:value-of select="$imageTitle"/></xsl:attribute>
+	                    <xsl:attribute name="title"><xsl:value-of select="$imageTitle"/></xsl:attribute>
+	                </img>
+	              </a>  
+	              <br/>
+	              <span class="thumbnail"><a href="{$url}" target="thumbnail-view"><xsl:value-of select="$imageTitle"/></a></span>
+	            </div>
+            </xsl:if>
           </xsl:with-param>
         </xsl:apply-templates>
       </xsl:otherwise>
