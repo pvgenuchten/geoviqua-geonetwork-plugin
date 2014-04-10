@@ -4,6 +4,7 @@
 	<id>1ff44540-b31a-11e2-9e96-0800200c9a66</id>
 	<version>4.0</version>
   	<depends>iso19139</depends>
+	<schemaLocation>
         http://www.geoviqua.org/QualityInformationModel/4.0 http://schemas.geoviqua.org/GVQ/4.0/GeoViQua_PQM_UQM.xsd 
         http://www.uncertml.org/2.0 http://www.uncertml.org/uncertml.xsd
         http://www.geoviqua.org/19115_updates http://schemas.geoviqua.org/ISO/19139/20120707_GVQ/19115_updates.xsd
