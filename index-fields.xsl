@@ -80,8 +80,8 @@
 					<Field name="identifier" string="{string(.)}" store="false" index="true"/>
 				</xsl:for-each>
 
-                <xsl:for-each select="gmd:identifier/gmd:RS_Identifier/gmd:code/gco:CharacterString">
-                	<Field name="identifier" string="{string(.)}" store="false" index="true"/>
+                		<xsl:for-each select="gmd:identifier/gmd:RS_Identifier/gmd:code/gco:CharacterString">
+                			<Field name="identifier" string="{string(.)}" store="false" index="true"/>
 				</xsl:for-each>
 
 	
@@ -129,11 +129,11 @@
 				</xsl:for-each>
 			</xsl:for-each>
 
-            <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-
-            <xsl:for-each select="gmd:pointOfContact[1]/*/gmd:role/*/@codeListValue">
-            	<Field name="responsiblePartyRole" string="{string(.)}" store="false" index="true"/>
-            </xsl:for-each>
+		            <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+		
+		            <xsl:for-each select="gmd:pointOfContact[1]/*/gmd:role/*/@codeListValue">
+		            	<Field name="responsiblePartyRole" string="{string(.)}" store="false" index="true"/>
+		            </xsl:for-each>
             
 			<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->		
 	
@@ -444,10 +444,13 @@
 	    <xsl:choose>
 	     <xsl:when test="gmd:identificationInfo/srv:SV_ServiceIdentification">
 	     	<Field name="type" string="service" store="false" index="true"/>
+	     	<Field name="hierarchyLevel" string="{string(.)}" store="true" index="true"/>
 	     </xsl:when>
-	     <!-- <xsl:otherwise>
-	      ... gmd:*_DataIdentification / hierachicalLevel is used and return dataset, serie, ... 
-	      </xsl:otherwise>-->
+	      <xsl:otherwise>
+	      <!--... gmd:*_DataIdentification / hierachicalLevel is used and return dataset, serie, ... -->
+	         <Field name="type" string="dataset" store="true" index="true"/>
+		 <Field name="hierarchyLevel" string="dataset" store="true" index="true"/>
+	      </xsl:otherwise>
 	    </xsl:choose>
 
 		<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->		
